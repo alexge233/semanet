@@ -1,2 +1,0 @@
-/home/alex/Projects/smnet/build/CMakeFiles/lsmnet.dir
-/home/alex/Projects/smnet/build/CMakeFiles/lsmnet.0.1.dir
