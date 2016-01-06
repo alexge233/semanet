@@ -1,0 +1,7 @@
+#include <vector>
+#include <memory>
+extern "C" {
+  #include <wn.h>
+};
+#include "graph/graph.hpp"
+#include "token_factory/token_factory.hpp"

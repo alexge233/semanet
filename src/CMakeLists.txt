@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 2.8)
+
+#add_subdirectory(DeltaPath)
+#add_subdirectory(DeltaPathFinder)
+add_subdirectory(layer)
+add_subdirectory(graph)
+#add_subdirectory(SemanticWordNet)
+add_subdirectory(hyper_handler)
+#add_subdirectory(HyponymHandler)
+#add_subdirectory(SynonymHandler)
+add_subdirectory(token_factory)

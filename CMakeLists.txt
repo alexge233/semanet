@@ -1,12 +1,8 @@
 PROJECT(smnet)
-
-set (smnet_VERSION_MAJOR 0)
-set (smnet_VERSION_MINOR 1)
-
+set(V_MAJOR 0)
+set(V_MINOR 1)
 message(${CMAKE_SYSTEM_NAME})
-
 cmake_minimum_required(VERSION 2.8)
-
 set(LIBRARY_PATH ${LIBRARY_PATH}
 		      /lib
 		      /usr/lib
@@ -15,37 +11,19 @@ set(LIBRARY_PATH ${LIBRARY_PATH}
 		      /usr/local/lib64
 		      /usr/lib/x86_64-linux-gnu)
 
-set(INCLUDE_DIRS ${INCLUDE_DIRS} /usr/includes)
+set(INCLUDE_DIRS ${INCLUDE_DIRS} /usr/includes
+                                 /usr/local/includes)
 include_directories(SYSTEM ${INCLUDE_DIRS})
-
-set (INCLUDES ${INCLUDES} includes)
-# Any CPP file of the library here!!!
-set (SOURCES ${SOURCES} ${INCLUDES}/DeltaPath/DeltaPath.cpp
-                        ${INCLUDES}/DeltaPathFinder/DeltaPathFinder.cpp
-                        ${INCLUDES}/HypernymHandler/HypernymHandler.cpp
-                        ${INCLUDES}/HyponymHandler/HyponymHandler.cpp
-                        ${INCLUDES}/SemanticGraph/SemanticGraph.cpp
-                        ${INCLUDES}/SemanticWordNet/SemanticWordNet.cpp
-                        ${INCLUDES}/SynonymHandler/SynonymHandler.cpp
-                        ${INCLUDES}/Wrapper/Wrapper.cpp
+set (SRC_DIR ${SRC_DIR} src)
+include_directories(${SRC_DIR}/)
+set (SOURCES ${SOURCES} #${SRC_DIR}/DeltaPath/DeltaPath.cpp
+                        #${SRC_DIR}/DeltaPathFinder/DeltaPathFinder.cpp
+                        ${SRC_DIR}/hyper_handler/hyper_handler.cpp
+                        #${SRC_DIR}/HyponymHandler/HyponymHandler.cpp
+                        ${SRC_DIR}/graph/graph.cpp
+                        #${SRC_DIR}/SemanticWordNet/SemanticWordNet.cpp
+                        #${SRC_DIR}/SynonymHandler/SynonymHandler.cpp
                         )
-
-# Setup library stuff
-add_library (lsmnet OBJECT ${SOURCES})
-add_library (lsmnet.0.1 SHARED $<TARGET_OBJECTS:lsmnet>)
-set(CMAKE_COLOR_MAKEFILE on)
-set(CMAKE_BUILD_TYPE Debug)
-
-# BOOST 
-find_package( Boost 1.49 REQUIRED )
-include_directories( ${Boost_INCLUDE_DIR} )
-
-# Cereal C++11
-find_path(CerealIncludes cereal/details/helpers.hpp PATHS ${INCLUDE_DIRS})
-if(NOT CerealIncludes)
-  message(FATAL_ERROR "Can't find Header Dir containing cereal/details/helpers.hpp")
-endif()
-
 # WordNet 3.0
 # NOTE: OSX fix is to set the flags to search given path, Linux doesn't need this
 # TODO: use if-else with${CMAKE_SYSTEM_NAME} and perform the correct check!
@@ -53,18 +31,26 @@ endif()
 find_library(WORDNET NAMES wordnet WN WN.a libWN.a wordnet-3.0) 
 if (WORDNET)
     message(STATUS ${WORDNET})
-    target_link_libraries(lsmnet.0.1 ${WORDNET})
 else (!WORDNET)
     message(FATAL_ERROR "ERROR: missing libwordnet")
 endif(WORDNET)
 
-# Threads
-find_package (Threads)
-target_link_libraries (lsmnet.0.1 ${CMAKE_THREAD_LIBS_INIT})
+# BOOST 
+find_package(Boost 1.56 COMPONENTS serialization REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
 
-# TODO: Add Example
-#add_executable (example1 examples/???.cpp)
+# Setup library stuff
+add_library (semanet OBJECT ${SOURCES})
+add_library (semanet-${V_MAJOR}.${V_MINOR} SHARED $<TARGET_OBJECTS:semanet>)
+target_link_libraries(semanet-${V_MAJOR}.${V_MINOR} ${Boost_SERIALIZATION_LIBRARY} ${WORDNET})
+set(LIBOBJ ${LIBOBJ} semanet-${V_MAJOR}.${V_MINOR})
 
+set(CMAKE_COLOR_MAKEFILE on)
+set(CMAKE_BUILD_TYPE Debug)
+
+# Add hypernym example
+add_executable(hypernym examples/hypernym.cpp)
+target_link_libraries(hypernym ${LIBOBJ})
 
 # NOTE - Support for Linux and OSX - Not Windows !
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -102,9 +88,3 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     message (FATAL_ERROR "unsupported compiler")
 endif()
-
-# Install Library and Headers
-install (TARGETS ${LIB_SHARED} DESTINATION /usr/local/lib/)
-install (DIRECTORY includes/ 
-         DESTINATION /usr/local/include/${PROJECT_NAME} 
-         FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp" PATTERN "*.hxx")

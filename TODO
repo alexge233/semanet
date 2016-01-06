@@ -1,23 +1,16 @@
-1) Cleanup any Icarus headers and related stuff
+TODO [0.1]
 
-2) Cleanup Headers and classes from comments and obsolete code
+    1) Remove all threaded code
+    2) add a few examples (2-3 should be enough) on how to use
+    3) fix path_finder for hyponyms and synonyms
+    4) use the `ptr_wrapper` and avoid handling raw pointers - then test for memory leaks
 
-3) Sanitise SemanticWordNet: make it thead-safe, use boost threads instead of std::threads.
-   Use boost thread objects instead of lambdas if it makes sense.
+TEST [0.1]
 
-4) namespace it: `smnet::`
-
-5) remove all usage of `cgpp::Token` replace with `std::string`
-
-6) Use functors to calculate DeltaPath values (DeltaPathFinder) - we need to be able to swap the formula on the fly
-
-7) Create a `node` class or struct, remove all dependencies on `cgpp`
-
-8) update all method and class names: lowecase, underscores and namespaced
-
-9) add a few examples (2-3 should be enough) on how to use
-
-10) Remove sense saving. Save only: a) graphs, layers, nodes
-                                    b) path values (e.g., Delta Values)
-                                    c) lookup matrix: (e.g., word-2-word similarity)
-
+    1) test hyper_handler (alone)
+    2) test hypo_handler (alone)
+    3) test syno_handler (alone)
+    4) test graph (alone)
+    5) test graph_factory
+    6) test path_finder & delta_path
+    7) finally, test the SemanticWordNet (or wtv you rename it to)

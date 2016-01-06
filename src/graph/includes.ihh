@@ -1,0 +1,13 @@
+#include <vector>
+#include <memory>
+#include <string>
+#include <stdexcept>
+#include <algorithm>
+#include <mutex>
+#include <boost/lexical_cast.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/functional/hash.hpp>
+#include "layer/layer.hpp"

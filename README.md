@@ -1,6 +1,7 @@
 @author Alex Giokas <a.gkiokas@warwick.ac.uk>
 @version 1
-@date 3-August-2015
+
+#WORK IN PROGRESS#
 
 A C++11 wrapper around WordNet 3.0 with some extra functionality.
 The wrapper iterates hypernyms, hyponyms and synonyms, and generates a tree graph.

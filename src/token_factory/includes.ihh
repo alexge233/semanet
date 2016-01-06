@@ -1,0 +1,8 @@
+#include <vector>
+#include <memory>
+#include <cassert>
+extern "C" {
+  #include <wn.h>
+};
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string.hpp> 
