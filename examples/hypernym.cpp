@@ -13,7 +13,7 @@ int main()
     // 2    VERB
     // 3    ADJECTIVE
     // 4    ADVERB 
-    std::vector<smnet::graph> graphs = hp("sky",1);
+    std::vector<smnet::graph> graphs = hp("blue",1);
 
     // TODO: iterate layers, printing each one on stdout
 

@@ -10,34 +10,40 @@ namespace smnet
 struct layer
 {
     /// this layer's nodes
-    std::unordered_set<std::string> nodes;
+    std::unordered_set<std::string> words;
     /// layers below (sub classes)
-    std::deque<std::shared_ptr<layer>> sub_classes;
+    std::vector<layer> sub_classes;
     /// layers above (super classes)
-    std::deque<std::shared_ptr<layer>> super_classes;
+    std::vector<layer> super_classes;
 
 
     /// construct using a list of nodes
-    layer(std::vector<std::string> others)
+    layer(std::unordered_set<std::string> others)
+    : words(others)
+    {}
+
+    ~layer()
     {
-        std::copy(others.begin(),others.end(),std::inserter(nodes,nodes.end()));
+        words.clear();
+        sub_classes.clear();
+        super_classes.clear();
     }
 
     /// Equality based upon all nodes being equal
     bool operator==(const layer & rhs) const
     {
-        return this->nodes == rhs.nodes;
+        return this->words == rhs.words;
     }
 
     /// does @param rhs exist in this layer 
     bool exists(const std::string & rhs) const
     {
-        return nodes.find(rhs) != nodes.end() ? true : false;
+        return words.find(rhs) != words.end() ? true : false;
     }
 
     template <class Archive> void serialize(Archive & ar, const unsigned int)
     {
-        ar(nodes, sub_classes, super_classes);
+        ar(words, sub_classes, super_classes);
     }
 };
 };

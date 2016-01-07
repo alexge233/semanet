@@ -18,7 +18,6 @@ set (SRC_DIR ${SRC_DIR} src)
 include_directories(${SRC_DIR}/)
 set (SOURCES ${SOURCES} #${SRC_DIR}/DeltaPath/DeltaPath.cpp
                         #${SRC_DIR}/DeltaPathFinder/DeltaPathFinder.cpp
-                        ${SRC_DIR}/hyper_handler/hyper_handler.cpp
                         #${SRC_DIR}/HyponymHandler/HyponymHandler.cpp
                         ${SRC_DIR}/graph/graph.cpp
                         #${SRC_DIR}/SemanticWordNet/SemanticWordNet.cpp

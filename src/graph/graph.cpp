@@ -16,85 +16,84 @@ void graph::merge_graph(const graph & rhs)
         _layers.push_back(rhs_ptr);
 }
 
-void graph::add_layer(const std::shared_ptr<layer> rhs)
+void graph::add_layer(const layer rhs)
 {
-    assert(rhs);
     if (std::find_if(this->_layers.begin(),this->_layers.end(),
-                     [&](const std::shared_ptr<layer> & lhs){ return *lhs == *rhs;}) 
+                     [&](const layer & lhs){ return lhs == rhs;}) 
                      != this->_layers.end())
     {
         _layers.push_back(rhs);
     }
 }
 
-std::shared_ptr<std::string> graph::find_node(const std::string key) const
+std::shared_ptr<std::string> graph::find_word(const std::string key) const
 {
-    for (const auto & layer_ptr : _layers)
+    for (const auto & lr : _layers)
     {
-        auto it = layer_ptr->nodes.find(key);
-        if (it != layer_ptr->nodes.end())
+        auto it = lr.words.find(key);
+        if (it != lr.words.end())
             return std::make_shared<std::string>(*it);
     }
     return nullptr;
 }
 
-std::shared_ptr<layer> graph::find_layer(const std::string key) const
+std::unique_ptr<layer> graph::find_layer(const std::string key) const
 {
-    for (const auto & layer_ptr : _layers)
+    for (const auto & lr : _layers)
     {
-        if (layer_ptr->exists(key))
-            return layer_ptr;
+        if (lr.exists(key))
+            return std::move(std::unique_ptr<layer>(new layer(lr)));
     }
     return nullptr;
 }
 
-std::vector<std::string> graph::superclass_nodes(const std::string key) const
+std::vector<std::string> graph::super_classes(const std::string key) const
 {
     std::vector<std::string> result;
     // find layer which contains `key`
     if (auto it = find_layer(key))
     {
-        // iterate all super_class layers, copying their nodes
-        for (const auto & layer_ptr : it->super_classes)
+        // iterate all super_class layers, copying their words
+        for (const auto & lr : it->super_classes)
         {
-            std::copy(layer_ptr->nodes.begin(),
-                      layer_ptr->nodes.end(),
+            std::copy(lr.words.begin(),
+                      lr.words.end(),
                       std::back_inserter(result));
         }
     }
     return result;
 }
 
-std::vector<std::string> graph::subclass_nodes(const std::string key) const
+std::vector<std::string> graph::sub_classes(const std::string key) const
 {
     std::vector<std::string> result;
     // find layer which contains `key`
     if (auto it = find_layer(key))
     {
-        // iterate all sub_class layers, copying their nodes
-        for (const auto & layer_ptr : it->sub_classes)
+        // iterate all sub_class layers, copying their words
+        for (const auto & lr : it->sub_classes)
         {
-            std::copy(layer_ptr->nodes.begin(),
-                      layer_ptr->nodes.end(),
+            std::copy(lr.words.begin(),
+                      lr.words.end(),
                       std::back_inserter(result));
         }
     }
     return result;
 }
 
-std::vector<std::string> graph::nodes() const
+std::vector<std::string> graph::words() const
 {
     std::vector<std::string> result;
-    for (const auto layer_ptr : _layers)
+    for (const auto & lr : _layers)
     {
-        std::copy(layer_ptr->nodes.begin(),
-                  layer_ptr->nodes.end(),
+        std::copy(lr.words.begin(),
+                  lr.words.end(),
                   std::back_inserter(result));
     }
     return result;
 }
 
-std::vector<std::shared_ptr<layer>> graph::layers() const
+std::vector<layer> graph::layers() const
 {
     return _layers;
 }

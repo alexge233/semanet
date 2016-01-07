@@ -4,60 +4,75 @@
 namespace smnet
 {
 /// init wordnet once flag
-std::once_flag w_onceFlag;
+std::once_flag w_once_alloc;
+
+struct sense_del
+{
+    void operator()(Synset *ptr)
+    {
+        if (ptr)
+            free_syns(ptr);
+    }
+};
+
+struct trace_del
+{
+    void operator()(Synset *ptr)
+    {
+        if (ptr)
+            free_synset(ptr);
+    }
+};
+
+void wn_init_once()
+{
+    // Init wordnet once
+    std::call_once(w_once_alloc,[]
+    { 
+        int res = wninit();
+        if (res) throw std::runtime_error("failed to init wordnet");
+    });
+}
+
+std::shared_ptr<Synset>
+shared_findtheinfo_ds(std::string key, int gram_type, int ptr_type, int sense_num)
+{
+    wn_init_once();
+    std::shared_ptr<Synset> sp(findtheinfo_ds(const_cast<char*>(key.c_str()), gram_type, ptr_type, sense_num),
+                               [](Synset * ptr){sense_del()(ptr);});
+    return sp;
+}
+
+std::shared_ptr<Synset> 
+shared_traceptrs_ds(SynsetPtr synptr, int ptr_type, int gram_type, int depth)
+{
+    assert(synptr);
+    std::shared_ptr<Synset> sp(traceptrs_ds(synptr, ptr_type, gram_type, depth),
+                              [](Synset *ptr){trace_del()(ptr);});
+    return sp;
+}
 
 /// @brief base struct `token_factory` for all wordnet handlers, retrieves actual strings
 /// @date January 2016
 ///
 struct token_factory
 {
-    /// get a shared_ptr around `Synset` (not SynsetPtr) from Wordnet's `findtheinfo_ds`
-    std::shared_ptr<Synset> make_findtheinfo_ds(
-                                                  std::string key,
-                                                  int pos,
-                                                  int ptr_type,
-                                                  int sense_num
-                                               )
-    {
-        // Init wordnet once - throw if not possible - assert for debug
-        std::call_once(w_onceFlag,[]{ int res = wninit();
-                                      assert(!res);
-                                      if (res) throw std::runtime_error("failed to init wordnet");});
-        
-        return std::shared_ptr<std::remove_pointer<SynsetPtr>::type>
-                    (findtheinfo_ds(const_cast<char*>(key.c_str()), pos, ptr_type, sense_num), free_syns);
-    }
-
-    /// Get a shared_ptr around `Synset` from Wordnet's `traceptrs_ds`
-    std::shared_ptr<Synset> make_traceptrs_ds(
-                                              std::shared_ptr<Synset> ptr,
-                                              int ptr_type,
-                                              int pos,
-                                              int depth
-                                             )
-    {
-        assert(ptr);
-        return std::shared_ptr<std::remove_pointer<SynsetPtr>::type>
-                   (traceptrs_ds(ptr.get(), ptr_type, pos,depth), free_synset);
-    }
-
     /// get a layer of nodes (words) using @param synset_ptr 
-    std::shared_ptr<layer> get_layer(const std::shared_ptr<Synset> synset_ptr)
+    layer get_layer(Synset * synset_ptr)
     {
         assert(synset_ptr);
-        std::vector<std::string> words;
+        std::unordered_set<std::string> words;
         for (int k = 0; k < synset_ptr->wcount; k++)
         {
-            std::string obj(synset_ptr->words[k]);
+            std::string obj(std::move(synset_ptr->words[k]));
             cleanup_str(obj);
-            words.push_back(obj);
+            words.insert(std::move(obj));
         }
-
         for (const auto & str : words)
             std::cout << str << std::endl;
 
         // Create a layer_ptr and return it using the discovered words
-        return std::make_shared<layer>(words); 
+        return layer(words);
     }
 
     /// Rudimentary string cleanup from underscores
