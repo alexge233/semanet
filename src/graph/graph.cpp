@@ -56,8 +56,8 @@ std::vector<std::string> graph::super_classes(const std::string key) const
         // iterate all super_class layers, copying their words
         for (const auto & lr : it->super_classes)
         {
-            std::copy(lr.words.begin(),
-                      lr.words.end(),
+            std::copy(lr->words.begin(),
+                      lr->words.end(),
                       std::back_inserter(result));
         }
     }
@@ -73,8 +73,8 @@ std::vector<std::string> graph::sub_classes(const std::string key) const
         // iterate all sub_class layers, copying their words
         for (const auto & lr : it->sub_classes)
         {
-            std::copy(lr.words.begin(),
-                      lr.words.end(),
+            std::copy(lr->words.begin(),
+                      lr->words.end(),
                       std::back_inserter(result));
         }
     }

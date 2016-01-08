@@ -57,8 +57,8 @@ private:
             layer current = get_layer(sense);
             rhs.add_layer(current);
             // link layer linked list (from sub to super & super to sub)
-            last.super_classes.push_back(current);
-            current.sub_classes.push_back(last);
+            last.super_classes.push_back(std::make_shared<layer>(current));
+            current.sub_classes.push_back(std::make_shared<layer>(last));
 
             // we encountered a fork/branch (more than one layer)
             // diverge now: iterate that new branch, and then come back here
@@ -66,7 +66,6 @@ private:
                 iterate_sense(sense->nextss, last, rhs,lexical);
             
             // get next layer (try Hyper(nym/verb/adj) or an instance
-            //iterate_sense(std::move(shared_traceptrs_ds(sense.get(), HYPERPTR, lexical, 1)), last, rhs, i, lexical);
             iterate_sense(sense->ptrlist, current, rhs, lexical);
         }
     }

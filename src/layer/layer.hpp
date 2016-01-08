@@ -12,9 +12,9 @@ struct layer
     /// this layer's nodes
     std::unordered_set<std::string> words;
     /// layers below (sub classes)
-    std::vector<layer> sub_classes;
+    std::vector<std::shared_ptr<layer>> sub_classes;
     /// layers above (super classes)
-    std::vector<layer> super_classes;
+    std::vector<std::shared_ptr<layer>> super_classes;
 
 
     /// construct using a list of nodes
