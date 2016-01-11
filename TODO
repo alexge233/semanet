@@ -3,7 +3,6 @@ TODO [0.1]
     1) Remove all threaded code
     2) add a few examples (2-3 should be enough) on how to use
     3) fix path_finder for hyponyms and synonyms
-    4) use the `ptr_wrapper` and avoid handling raw pointers - then test for memory leaks
 
 TEST [0.1]
 

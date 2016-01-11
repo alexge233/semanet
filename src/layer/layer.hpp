@@ -12,22 +12,14 @@ struct layer
     /// this layer's nodes
     std::unordered_set<std::string> words;
     /// layers below (sub classes)
-    std::vector<std::shared_ptr<layer>> sub_classes;
+    std::vector<layer*> sub_classes;
     /// layers above (super classes)
-    std::vector<std::shared_ptr<layer>> super_classes;
-
+    std::vector<layer*> super_classes;
 
     /// construct using a list of nodes
     layer(std::unordered_set<std::string> others)
     : words(others)
     {}
-
-    ~layer()
-    {
-        words.clear();
-        sub_classes.clear();
-        super_classes.clear();
-    }
 
     /// Equality based upon all nodes being equal
     bool operator==(const layer & rhs) const

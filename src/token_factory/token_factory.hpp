@@ -10,8 +10,7 @@ struct sense_del
 {
     void operator()(Synset *ptr)
     {
-        if (ptr)
-            free_syns(ptr);
+        if (ptr) free_syns(ptr);
     }
 };
 
@@ -19,8 +18,7 @@ struct trace_del
 {
     void operator()(Synset *ptr)
     {
-        if (ptr)
-            free_synset(ptr);
+        if (ptr) free_synset(ptr);
     }
 };
 
@@ -38,7 +36,8 @@ std::shared_ptr<Synset>
 shared_findtheinfo_ds(std::string key, int gram_type, int ptr_type, int sense_num)
 {
     wn_init_once();
-    std::shared_ptr<Synset> sp(findtheinfo_ds(const_cast<char*>(key.c_str()), gram_type, ptr_type, sense_num),
+    std::shared_ptr<Synset> sp(findtheinfo_ds(const_cast<char*>(key.c_str()), 
+                                              gram_type, ptr_type, sense_num),
                                [](Synset * ptr){sense_del()(ptr);});
     return sp;
 }
@@ -58,7 +57,7 @@ shared_traceptrs_ds(SynsetPtr synptr, int ptr_type, int gram_type, int depth)
 struct token_factory
 {
     /// get a layer of nodes (words) using @param synset_ptr 
-    layer get_layer(Synset * synset_ptr)
+    std::shared_ptr<layer> get_layer(Synset * synset_ptr)
     {
         assert(synset_ptr);
         std::unordered_set<std::string> words;
@@ -68,11 +67,8 @@ struct token_factory
             cleanup_str(obj);
             words.insert(std::move(obj));
         }
-        for (const auto & str : words)
-            std::cout << str << std::endl;
-
         // Create a layer_ptr and return it using the discovered words
-        return layer(words);
+        return std::make_shared<layer>(words);
     }
 
     /// Rudimentary string cleanup from underscores

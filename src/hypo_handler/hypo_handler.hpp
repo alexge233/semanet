@@ -1,85 +1,52 @@
-#ifndef _ICARUS_HyponymHandler_HPP_
-#define _ICARUS_HyponymHandler_HPP_
-#pragma once
-#include "Includes.hxx"
-/**
- * Handle Hyponyms from Word-Net ( Hypo-Nouns && Hypo-Verbs )
- * Hyponyms in Wordnet are grouped in Senses, and are traversed as Lists.
- * 
- * @version 2
- * @date 17-May-2014
- * 
- * @see http://wordnet.princeton.edu/wordnet/man/wnsearch.3WN.html
- */
-class HyponymHandler : protected SynsetHandler
+#ifndef _smnet_hypo_handler_HPP_
+#define _smnet_hypo_handler_HPP_
+#include "includes.ihh"
+namespace smnet
 {
-  public:
+/// @brief class hypo_handler extracts hyponym senses as graphs from WordNet
+/// @date January 2017
+///
+class hypo_handler : protected token_factory
+{
+public:
     
-    HyponymHandler (
-		     cgpp::Token query,
-		     int lexical_tag
-		   );
+    std::vector<graph> operator()(std::string key, int lexical)
+    {
+        wn_init_once();
+        std::vector<graph> result;
+        if(auto ss_ptr = findtheinfo_ds(const_cast<char*>(key.c_str()),
+                                        lexical, HYPOPTR, 1))   // NOTE: WHY 1?
+        {
+            while(ss_ptr)
+            {
+                if (SynsetPtr trc_ptr = traceptrs_ds(ss_ptr, HYPOPTR, lexical, 1))
+                {
+                    graph grf = graph();
+                    layer first = get_layer(ss_ptr);
+                    grf.add_layer(first);
+                    iterate_sense(trc_ptr, first, grf, lexical);
+                    result.push_back(grf);
+                    free_syns(trc_ptr);
+                }
+                ss_ptr = ss_ptr->nextss;
+            }
+            free_syns(ss_ptr);
+        }
+        return result;
+    }
     
+private:
     
-    std::vector<std::shared_ptr<SemanticGraph>> Discover ( );
-    
-    
-  private:
-    
-    
-    /// Set of Graphs ( Senses )
-    std::vector<std::shared_ptr<SemanticGraph>> _graphs;
-    
-    /// All encountered cgpp::Tokens as rows
-    std::deque<std::vector<cgpp::Token>> _token_lists;
-    
-    /// original query
-    cgpp::Token _query;
-    
-    /// original lexical tag
-    int _lexical_tag;
-    
-    /// Total maximum hyponyms that will be iterated before aborting
-    static constexpr int MAX_HYPONYMS = 100;
-    
-    int _count = 0;
-    
-    /// Main Hypobyn discovery loop
-    void _hyponyms (
-		    SynsetPtr  ptr,
-		    std::vector<cgpp::Token> previous,
-		    std::shared_ptr<SemanticGraph> graph,
-		    int i,
-		    bool release,
-		    int lexical_tag
-		  );
-    
-    /// Populate Graph with tokens lists
-    void _populate ( std::shared_ptr<SemanticGraph> graph );
-    
-    /// Add A list of cgpp::Tokens to current queue
-    void __add ( std::vector<cgpp::Token> tokens );
-    
-    /// connect nodes within this layer
-    void __connectIntraNodes (
-			       std::vector<cgpp::Token> current,
-			       std::shared_ptr<SemanticGraph> graph
-			     );
-    
-    /// Connect Current to Previous layer
-    void __connectExtraNodes (
-				std::vector<cgpp::Token> previous,
-				std::vector<cgpp::Token> current,
-				std::shared_ptr<SemanticGraph> graph
-			    );
-    
-    /// Create current layer and add it to graph
-    std::shared_ptr<Layer> __createLayer (
-					    std::vector<cgpp::Token> current,
-					    std::shared_ptr<SemanticGraph> graph
-					  );
+    void iterate_sense(
+                        Synset * sense,
+                        layer previous,
+                        graph & rhs,
+                        int lexical
+                      )
+    {
+        // REMEMBER: this is reverse iteration!
+        // REMEMBER: HYPOPTR returns only one Layer (?)
+    }
 };
-
-
-
+};
 #endif

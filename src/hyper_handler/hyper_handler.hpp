@@ -3,9 +3,8 @@
 #include "includes.ihh"
 namespace smnet
 {
-/// @brief class `hypernym_handler` extracts hypernym senses as graphs from WordNet (`-hype` param)
+/// @brief class hyper_handler extracts hypernym senses as graphs from WordNet
 /// @date January 2016
-/// @BUG: Finally found it! I am deleting one Synset as trace, thus leaking bytes every time
 ///
 class hyper_handler : protected token_factory
 {
@@ -21,16 +20,19 @@ public:
     {
         wn_init_once();
         std::vector<graph> result;
-        if (auto ss_ptr = findtheinfo_ds(const_cast<char*>(key.c_str()), lexical, HYPERPTR, ALLSENSES))
+        if (auto ss_ptr = findtheinfo_ds(const_cast<char*>(key.c_str()),
+                                         lexical, HYPERPTR, ALLSENSES))
         {
+            // iterate senses
             while(ss_ptr)
             {
+                // iterate a sense
                 if (SynsetPtr trc_ptr = traceptrs_ds(ss_ptr, HYPERPTR, lexical, 1))
                 {
                     graph grf = graph();
-                    layer first = get_layer(ss_ptr);
-                    grf.add_layer(first);
-                    iterate_sense(trc_ptr, first, grf, lexical);
+                    std::shared_ptr<layer> last = std::move(get_layer(ss_ptr));
+                    grf.add_layer(last);
+                    iterate_sense(trc_ptr, last, grf, lexical);
                     result.push_back(grf);
                     free_syns(trc_ptr);
                 }
@@ -47,26 +49,30 @@ private:
     /// Main loop for finding a sense's Hypernyms
     void iterate_sense(
                         Synset * sense,
-                        layer last,
+                        std::shared_ptr<layer> last,
                         graph & rhs,
                         int lexical
                       )
     {
-        if (sense)
+        std::shared_ptr<layer> current;
+        while (sense && last)
         {
-            layer current = get_layer(sense);
-            rhs.add_layer(current);
+            current = std::move(get_layer(sense));
+
             // link layer linked list (from sub to super & super to sub)
-            last.super_classes.push_back(std::make_shared<layer>(current));
-            current.sub_classes.push_back(std::make_shared<layer>(last));
+            // warning - passing by lval here seems to leak - but not doing so breaks the tree!!!
+            last->super_classes.push_back(current.get());
+            current->sub_classes.push_back(last.get());
+            rhs.add_layer(current);
 
             // we encountered a fork/branch (more than one layer)
             // diverge now: iterate that new branch, and then come back here
             if (sense->ptrlist)
-                iterate_sense(sense->nextss, last, rhs,lexical);
+                iterate_sense(sense->nextss, last, rhs, lexical);
             
-            // get next layer (try Hyper(nym/verb/adj) or an instance
-            iterate_sense(sense->ptrlist, current, rhs, lexical);
+            // update current to last
+            last = std::move(current);
+            sense = sense->ptrlist;
         }
     }
 };
