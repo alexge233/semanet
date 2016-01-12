@@ -7,7 +7,7 @@ It offers:
 * Trouble free WordNet querying without worrying about memory management
 * Parsing of WordNet senses in a tree-graph class (see classes `graph` and `layer`)
 * Path finding between words, and quantifying their *semantic distance*
-* Other utilities, such as intersections and unions of WordNet tree graphs.
+* Other utilities such as intersections and unions of WordNet tree graphs.
 
 ##Dependencies
 
@@ -35,8 +35,8 @@ make
 
 You should now have in your `build` directory:
 
-* `libsemanet-0.1.s0` unless you changed `CMakeLists.txt` to build a static library
-* `hypernym` an example on how to get hypernyms and print them stdout
+* `libsemanet-0.1.so` (unless you changed `CMakeLists.txt` to build a static library)
+* `hypernym` an example on how to get hypernyms and print them on stdout
 * `hyponym` an example on how to get hyponyms and print them on stdout
 * `synonym` an example on how to get synonyms and prin them on stdout
 * `pathfind` an example on how to obtain semantic difference between two words
@@ -63,9 +63,9 @@ Depending on the type of query and the lexical category (Noun, Verb, Adjective, 
 most words share some kind of abstract archetype.
 
 ###Hyponyms
-Hyponyms are *specializations* or *instantiations* commonly, sub-classes
+Hyponyms are *specializations* or *instantiations* linked as sub-classes
 or sub-ordinate words which add specificity to your query.
-Those are always returned as a single layer, below your current layer
+Those are always returned as a single layer below your current layer
 within which your query is to be found.
 
 This however does not mean that there exist no more sub-classes,
