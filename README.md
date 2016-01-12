@@ -73,16 +73,16 @@ its WordNet which choses to only return a sub-class layer.
 The reason is most likely that returning all known sub-classes,
 would return a huge graph.
 Thus, if you wish to search all known sub-classes, you have to do
-multiple queries, which compared to hypernyms is a different approach.
+multiple queries, compared to hypernyms which requires a single query.
 
 ###Synonyms
 Synonyms simply denote words which are *almost* the same (or exactly the same).
-Thus, when you query synonyms, you will get a layer which contains your query word,
-as well as other words within the same layer.
+Thus when you query synonyms, you will get a layer which contains your query word,
+as well as other words (the synonyms).
 
 ###Antonyms
 As of version (0.1) I have not implemented antonyms.
 
 ###Contributor
 
-Alexander Giokas, **[a.gkiokas@warwick.ac.uk]**
+- Alexander Giokas, **[a.gkiokas@warwick.ac.uk]**
