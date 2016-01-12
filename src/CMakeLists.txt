@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
-#add_subdirectory(DeltaPath)
-#add_subdirectory(DeltaPathFinder)
+add_subdirectory(delta_path)
+add_subdirectory(path_finder)
 add_subdirectory(layer)
 add_subdirectory(graph)
 add_subdirectory(hyper_handler)

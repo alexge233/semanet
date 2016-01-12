@@ -20,8 +20,14 @@ public:
 protected:
 
     /// Calculate the Delta Value: `δ = (α * direction) * (1 + distance * β)`
+    /// BUG: the formula below is not working properly:
+    ///      for [robot,android] it returns +0.9 (as expected I guess)
+    ///      for [android,robot] it returns -0.9 (not what I want)
+    /// REWORK IT
     inline float delta(float direction, float distance)
     {
+        // TODO: find a way to squash the values between 0 and 1
+        //       either min-max them, or use some logistic sigmoid
         return (alpha*direction)*(1.f+(distance * beta));
     }
 

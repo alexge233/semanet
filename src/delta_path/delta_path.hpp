@@ -13,6 +13,10 @@ struct delta_path
     std::string to;
     float delta = 0.f;
 
+
+    delta_path(std::string origin, std::string target, float value)
+    : from(origin), to(target), delta(value) {}
+
     /// Sort delta values based on `from` and then `to` node values
     bool operator<(const delta_path & rhs)
     {
@@ -20,14 +24,14 @@ struct delta_path
     }
 
     /// Equality depends on both `from` and `to` node values
-    bool operator==(const delta_path &)
+    bool operator==(const delta_path & rhs)
     {
         return (this->from == rhs.from) && (this->to == rhs.to);
     }
 
-    void print() const
+    void print() 
     {
-        printf("%s -> %s = %f\r\n",from,to,delta);
+        printf("%s ≈ %s: %f\r\n", from.c_str(), to.c_str(), delta);
     }
 
     template <class Archive> void serialize(Archive & ar, const unsigned int)
@@ -35,6 +39,13 @@ struct delta_path
         ar(from, to, delta);
     }
 };
+
+/// comparison function for std::min_element
+bool compare_delta_path(const delta_path & lhs, const delta_path & rhs)
+{
+    return lhs.delta < rhs.delta;
+}
+
 };
 
 namespace std
@@ -45,7 +56,7 @@ template<> struct hash<smnet::delta_path>
     {
         std::size_t seed = 0;
         boost::hash_combine(seed, rhs.from);
-        boost::hash_combine(seed, rhs,to);
+        boost::hash_combine(seed, rhs.to);
         return seed;
     }
 };

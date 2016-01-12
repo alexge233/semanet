@@ -1,4 +1,4 @@
-ifndef _smnet_hyper_handler_HPP_
+#ifndef _smnet_hyper_handler_HPP_
 #define _smnet_hyper_handler_HPP_
 #include "includes.ihh"
 namespace smnet

@@ -29,15 +29,12 @@ int main()
     std::vector<smnet::graph> graphs = hp(key ,1);
     std::cout << graphs.size() << " graphs for: \""<< key <<"\" noun hypernym\r\n";
     
-    if (graphs.size() > 0)
+    for (const auto & graph : graphs)
     {
-        for (const auto & graph : graphs)
-        {
-            std::shared_ptr<smnet::layer> root = graph.root();
-            int i = 0;
-            callback(root.get(), i);
-            std::cout << std::endl;
-        }
+        std::shared_ptr<smnet::layer> root = graph.root();
+        int i = 0;
+        callback(root.get(), i);
+        std::cout << std::endl;
     }
 
     return 0;
