@@ -1,9 +1,10 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
-
-#include <cgpp/Node/Node.hpp>
-
-#include "../SemanticGraph/SemanticGraph.hpp"
-#include "../SynsetHandler/SynsetHandler.hpp"
-#include "../Wrapper/Wrapper.hpp"
+#include <mutex>
+extern "C" {
+  #include <wn.h>
+};
+#include "graph/graph.hpp"
+#include "token_factory/token_factory.hpp"
+#include "layer/layer.hpp"

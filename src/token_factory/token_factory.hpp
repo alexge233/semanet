@@ -68,7 +68,8 @@ struct token_factory
             words.insert(std::move(obj));
         }
         // Create a layer_ptr and return it using the discovered words
-        return std::make_shared<layer>(words);
+        // immediately forfeit ownership of pointer
+        return std::move(std::make_shared<layer>(words));
     }
 
     /// Rudimentary string cleanup from underscores

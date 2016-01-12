@@ -1,15 +1,11 @@
 TODO [0.1]
 
     1) Remove all threaded code
-    2) add a few examples (2-3 should be enough) on how to use
-    3) fix path_finder for hyponyms and synonyms
+    2) fix path_finder for hyponyms and synonyms
 
 TEST [0.1]
 
-    1) test hyper_handler (alone)
-    2) test hypo_handler (alone)
-    3) test syno_handler (alone)
-    4) test graph (alone)
-    5) test graph_factory
+    4) test graph (alone) - add unit tests for graph
+    5) test graph_factory???
     6) test path_finder & delta_path
     7) finally, test the SemanticWordNet (or wtv you rename it to)

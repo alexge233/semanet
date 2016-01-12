@@ -1,5 +1,5 @@
 @author Alex Giokas <a.gkiokas@warwick.ac.uk>
-@version 1
+@version 0.1
 
 #WORK IN PROGRESS#
 
@@ -11,7 +11,7 @@ This library depends on:
 
 Boost library (1.49)
 WordNet Library (3.0)
-Cereal Library serialisation (http://uscilab.github.io/cereal)
-CGPP Library (https://github.com/alexge233/cgpp)
 
-TODO: build and install instructions
+#TODO: build and install instructions
+
+#TODO: usage instructions

@@ -1,13 +1,12 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include <mutex>
 
 extern "C" {
   #include <wn.h>
 };
 
-#include <cgpp/Node/Node.hpp>
-
-#include "../SemanticGraph/SemanticGraph.hpp"
-#include "../SynsetHandler/SynsetHandler.hpp"
-#include "../Wrapper/Wrapper.hpp"
+#include "token_factory/token_factory.hpp"
+#include "graph/graph.hpp"
+#include "layer/layer.hpp"

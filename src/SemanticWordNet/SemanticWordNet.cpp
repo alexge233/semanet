@@ -1,63 +1,17 @@
 #include "sema_net.hpp"
 namespace smnet
 {
-SemanticWordNet::SemanticWordNet ( )
-{
-    bool loading = true;
-    std::cout << "Loading Semantics ";
-    
-    std::thread spinner = std::thread ( [&] ()
-    {
-        std::cout << '-' << std::flush;
-        while ( loading )
-        {
-            sleep(0.5);
-            std::cout << "\b\\" << std::flush;
-            sleep(0.5);
-            std::cout << "\b|" << std::flush;
-            sleep(0.5);
-            std::cout << "\b/" << std::flush;
-            sleep(0.5);
-            std::cout << "\b-" << std::flush;
-        }
-    });
-    
-
-    _fname = "SemanticMemory.bin";
-    std::ifstream input( _fname );
-
-    if ( input.is_open() )
-    {
-        cereal::BinaryInputArchive archive ( input );
-        archive( _graph, _deltas ); // NOTE: Loading the graph is extremely slow - we only need deltas
-        loading = false;
-        spinner.join();
-        std::cout << "Semantics Loaded: " << _deltas.size() << " precomputed Delta Paths" << std::endl;
-    }
-    else
-    {
-        loading = false;
-        spinner.join();
-        std::cerr << " Error: could not load or find: " << _fname << std::endl;
-        _graph = std::make_shared<SemanticGraph>();
-    }
-}
-
 
 float SemanticWordNet::SearchForPath (
                                         cgpp::Token from,
                                         cgpp::Token to
                                      )
 {
-    // TODO: Enable MT access - lock only search callbacks - findMinDelta should be locked only when written?
-
     if ( from != to )
     {
         // Try to see if we have results in our lookup table
         if ( auto deltapath = findMinDelta( from, to ) )
         {
-            //std::cout << "Found min Delta in lookup set for [\"" << from.value() << "\", \""
-            //          << to.value() << "\"] = " << deltapath->Delta() << std::endl;
             return deltapath->Delta();
         }
 
@@ -92,24 +46,6 @@ float SemanticWordNet::SearchForPath (
     return 0.f;
 }
 
-const std::shared_ptr<SemanticGraph> SemanticWordNet::GlobalGraph ( ) const
-{
-    return _graph;
-}
-
-void SemanticWordNet::Save ( ) const
-{
-    std::lock_guard<std::mutex> lock ( save_mtx );
-    std::ofstream output ( _fname );
-    if ( output.is_open() )
-    {
-        cereal::BinaryOutputArchive archive( output );
-        archive( _graph, _deltas ); // NOTE: saving and loading graph is large and slow. We only really need Deltas
-    }
-    else
-        std::cerr << "Could not open file "  << _fname << " to save" << std::endl;
-}
-
 std::vector<DeltaPath> SemanticWordNet::searchCallback (
                                                             cgpp::Token from,
                                                             cgpp::Token to,
@@ -126,7 +62,6 @@ std::vector<DeltaPath> SemanticWordNet::searchCallback (
      * If they don't exist in memory, try to find them from Word-Net
      * WARNING Lock wn_mtx - DANGER wordnet callbacks are NOT thread safe
      */
-    wn_mtx.lock();
     if ( !fromSenses )
     {
         //std::cout << "from \"" << from.value() << "\" senses retrieved now" << std::endl;
@@ -141,7 +76,6 @@ std::vector<DeltaPath> SemanticWordNet::searchCallback (
         toSenses->AddToGraph( _graph );
         addSenses ( toSenses );
     }
-    wn_mtx.unlock();
 
     // If either Sense is empty - ABORT
     if ( fromSenses->IsEmpty() || toSenses->IsEmpty() )
@@ -151,30 +85,20 @@ std::vector<DeltaPath> SemanticWordNet::searchCallback (
     }
 
     // Try to find direct paths [from,to]
-    std::thread fromThread = std::thread ( [&] ()
+    auto paths = fromSenses->FindDirectDeltas ( to );
+    if ( !paths.empty() )
     {
-        auto paths = fromSenses->FindDirectDeltas ( to );
-        if ( !paths.empty() )
-        {
-            std::lock_guard<std::mutex> lock ( mtx );
-            std::copy ( paths.begin(), paths.end(), std::back_inserter( result ) );
-        }
-    });
+        std::lock_guard<std::mutex> lock ( mtx );
+        std::copy ( paths.begin(), paths.end(), std::back_inserter( result ) );
+    }
 
     // Try to find direct paths [to,from]
-    std::thread toThread = std::thread ( [&] ()
+    auto paths = toSenses->FindDirectDeltas ( from );
+    if ( !paths.empty() )
     {
-        auto paths = toSenses->FindDirectDeltas ( from );
-        if ( !paths.empty() )
-        {
-            std::lock_guard<std::mutex> lock ( mtx );
-            std::copy ( paths.begin(), paths.end(), std::back_inserter( result ) );
-        }
-    });
-
-    // Wait for two threads to finish
-    fromThread.join();
-    toThread.join();
+        std::lock_guard<std::mutex> lock ( mtx );
+        std::copy ( paths.begin(), paths.end(), std::back_inserter( result ) );
+    }
 
     // We didn't find any direct path so far, start looking for intersections
     if ( result.empty() )
@@ -182,8 +106,6 @@ std::vector<DeltaPath> SemanticWordNet::searchCallback (
         auto paths = testIntersections ( fromSenses, toSenses );
         std::copy ( paths.begin(), paths.end(), std::back_inserter( result ) );
     }
-
-    Save();
 
     return result;
 }
@@ -197,7 +119,6 @@ std::vector<cgpp::Token> SemanticWordNet::findIntersections (
     std::vector<cgpp::Token> result;
     if ( fromSenses && toSenses )
     {
-        std::mutex mtx;
         std::vector<std::thread> threads;
         auto from_hyperset = fromSenses->All();
         auto to_hyperset =  toSenses->All();
@@ -206,15 +127,11 @@ std::vector<cgpp::Token> SemanticWordNet::findIntersections (
         {
             for ( const auto & to_set : to_hyperset )
             {
-                threads.push_back ( std::thread ( [&] ()
-                {
                     auto res = intersectCallback ( from_set, to_set );
                     if ( !res.empty() )
                     {
-                        std::lock_guard<std::mutex> lock ( mtx );
                         std::copy ( res.begin(), res.end(), std::back_inserter( result ) );
                     }
-                }));
             }
         }
         for ( auto & t : threads ) t.join();
@@ -279,15 +196,12 @@ std::vector<DeltaPath> SemanticWordNet::testIntersections (
 
     if ( !sect_set.empty() )
     {
-        std::mutex mtx;
         std::vector<std::thread> threads;
         std::vector<DeltaPath> f2paths, t2paths;
 
         // For each Intersecting / Common token
         for ( const auto & sect : sect_set )
         {
-            threads.push_back ( std::thread ( [&]()
-            {
                 // 4 searches: Hyper [from,sect], Hyper [sect,from], Hypo [sect,from], Syno [sect,from]
                 auto p1 = fromSenses->FindDirectDeltas ( sect );
                 if ( !p1.empty() )
@@ -302,7 +216,6 @@ std::vector<DeltaPath> SemanticWordNet::testIntersections (
                     std::lock_guard<std::mutex> lock ( mtx );
                     std::copy ( p2.begin(), p2.end(), std::back_inserter( t2paths ) );
                 }
-            }));
         }
 
         // Wait for all searches to finish

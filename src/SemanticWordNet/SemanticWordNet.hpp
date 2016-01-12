@@ -16,9 +16,6 @@ class network
 {
 public:
 
-    ///
-    sema_net();
-
     /// find the smallest delta value
     /// `δ` denotes the semantic difference between two words
     float find_delta(
@@ -82,7 +79,8 @@ private:
 
 
 
-    /// List of acquired Senses (TODO: sense is a graph_factory)
+    // List of acquired Senses (Sense is a collection of `graph` obtained from WordNet)
+    // Don't store them
     std::vector<std::shared_ptr<Senses>> _senses;
 
     /// Global Semantic Graph (TODO: remove and index/store individual sub_graphs)

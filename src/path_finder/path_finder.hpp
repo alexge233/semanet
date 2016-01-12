@@ -3,45 +3,36 @@
 #include "includes.ihh"
 namespace smnet
 {
-/// @author Alex Giokas <a.gkiokas@warwick.ac.uk>
-/// @date November 2015
-/// @class delta_pathFinder
-/// @brief Used to search Semantic Graphs and discover Paths
+/// @brief class `path_finder` is used to establish paths
+///        between two different words, by quering WordNet
+/// @date January 2016
 ///
 class path_finder
 {
 public:
 
     /// Construct for specific Tokens [from,to]
-    path_finder(std::string from, std::string to);
+    path_finder(const graph & rhs);
 
-    /// search hypernym paths between `from` and `to` within @param graph
-    std::vector<delta_path> hypernym_paths(const graph & rhs) const;
-
-    /// search hypnym paths between `from` and `to` within @param graph 
-    std::vector<delta_path> hyponym_paths(const graph & rhs) const;
-
-    /// Find direct path between [from,tp] withn this synonym set of graphs
-    std::vector<delta_path> synonym_paths(const graph & rhs) const;
+    /// find `delta_path` for @param from to @param to
+    std::unique_ptr<delta_path> operator()(std::string from, std::string to) const;
 
 protected:
 
     /// Calculate the Delta Value: `δ = (α * direction) * (1 + distance * β)`
-    inline float delta( 
-                        float direction,
-                        float distance
-                      )
+    inline float delta(float direction, float distance)
     {
         return (alpha*direction)*(1.f+(distance * beta));
     }
 
+    /// reference to the graph used for iteration
+    const graph & _graph;
 
-    std::string _from;
-    std::string _to;
     /// discount factor for direction
     const float alpha = 0.1f;
+
     /// discount factor for distance
     const float beta = 0.1f;
 };
-}
+};
 #endif

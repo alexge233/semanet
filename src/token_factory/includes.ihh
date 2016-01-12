@@ -1,8 +1,11 @@
 #include <vector>
 #include <memory>
+#include <unordered_set>
 #include <cassert>
 extern "C" {
   #include <wn.h>
 };
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string.hpp> 
+
+#include "layer/layer.hpp"

@@ -2,20 +2,26 @@
 namespace smnet
 {
 
-path_finder::path_finder(
-                            std::string from,
-                            std::string to
-                         )
-: _from(from), _to(to)
-{}
+path_finder::path_finder(const graph & rhs)
+: _graph(rhs){}
 
-// hypernyms are in layers above (supers)
+std::unique_ptr<delta_path> path_finder::operator()(std::string from, std::string to) const
+{
+    // search and find within a graph the smallest `delta_path` that exists
+    // Do this by locating the layers in which `from` and `to` are to be found
+    // We also need to establish the direction: 
+    //                  (+) if moving from sub -> super
+    //                  (-) if moving from super -> sub
+    //                  (0) if within the same layer
+
+}
+
 std::vector<delta_path> path_finder::hypernym_paths(const graph & rhs) const
 {
-    assert(graph);
     std::vector<delta_path> results;
     auto n1 = graph->Find(_from);   // ???
     auto n2 = graph->Find(_to);     // ???
+
     if (n1 && n2)
     {
         // Recursive lambda 
@@ -122,4 +128,5 @@ std::vector<delta_path> path_finder::synonym_paths(const graph & rhs)
     }
     return result;
 }
+
 };

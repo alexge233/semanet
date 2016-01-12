@@ -18,7 +18,6 @@ set (SRC_DIR ${SRC_DIR} src)
 include_directories(${SRC_DIR}/)
 set (SOURCES ${SOURCES} #${SRC_DIR}/DeltaPath/DeltaPath.cpp
                         #${SRC_DIR}/DeltaPathFinder/DeltaPathFinder.cpp
-                        #${SRC_DIR}/HyponymHandler/HyponymHandler.cpp
                         ${SRC_DIR}/graph/graph.cpp
                         #${SRC_DIR}/SemanticWordNet/SemanticWordNet.cpp
                         #${SRC_DIR}/SynonymHandler/SynonymHandler.cpp
@@ -49,7 +48,12 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # Add hypernym example
 add_executable(hypernym examples/hypernym.cpp)
+add_executable(hyponym examples/hyponym.cpp)
+add_executable(synonym examples/synonym.cpp)
+
 target_link_libraries(hypernym ${LIBOBJ})
+target_link_libraries(hyponym ${LIBOBJ})
+target_link_libraries(synonym ${LIBOBJ})
 
 # NOTE - Support for Linux and OSX - Not Windows !
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
