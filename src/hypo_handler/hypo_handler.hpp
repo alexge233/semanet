@@ -19,7 +19,7 @@ public:
     {
         wn_init_once();
         std::vector<graph> result;
-        if(auto ss_ptr = findtheinfo_ds(const_cast<char*>(key.c_str()),
+        if (auto ss_ptr = findtheinfo_ds(const_cast<char*>(key.c_str()),
                                         lexical, HYPOPTR, ALLSENSES))
         {
             while(ss_ptr)
@@ -29,18 +29,22 @@ public:
                     graph grf = graph();
 
                     // super_layer: we move towards `sub_classes` 
-                    std::shared_ptr<layer> super_layer = get_layer(ss_ptr);
-                    // graph add layer (and ref count++)
-                    grf.add_layer(super_layer);
+                    auto super_layer = std::make_shared<layer>(get_layer(ss_ptr));
+                    layer * super_ptr = super_layer.get();
+
+                    // graph add layer & owns pointer
+                    grf.add_layer(std::move(super_layer));
 
                     // iterate one sub layer below
-                    iterate_layers(trc_ptr, super_layer, grf, lexical);
+                    iterate_layers(trc_ptr, super_ptr, grf, lexical);
 
                     // copy the graph and free this sense
                     result.push_back(grf);
                     free_syns(trc_ptr);
                 }
+                auto ss_ptr_old = ss_ptr;
                 ss_ptr = ss_ptr->nextss;
+                free_synset(ss_ptr_old);
             }
             free_syns(ss_ptr);
         }
@@ -51,7 +55,7 @@ private:
     
     void iterate_layers(
                         Synset * sense,
-                        std::shared_ptr<layer> super_layer,
+                        layer * super_ptr,
                         graph & rhs,
                         int lexical
                       )
@@ -60,27 +64,28 @@ private:
 
         // warning - some queries may have thousands of layers
         //           such as when queries archetypes (`entity`, `object`, etc)
-        while (sense && super_layer)
+        while (sense && super_ptr)
         {
             // sub layer:
             // normally there won't be any more layers below
             // but there might be more than one branch
-            sub_layer = get_layer(sense);
+            sub_layer = std::make_shared<layer>(get_layer(sense));
 
             // link super_layer to sub_layer 
-            super_layer->sub_classes.push_back(sub_layer.get());
-            sub_layer->super_classes.push_back(super_layer.get());
+            super_ptr->sub_classes.push_back(sub_layer.get());
+            sub_layer->super_classes.push_back(super_ptr);
             
-            // graph owns the layer (ref count++)
-            rhs.add_layer(sub_layer);
+            // graph owns the layer ptr
+            layer * sub_ptr = sub_layer.get();
+            rhs.add_layer(std::move(sub_layer));
 
             // we encountered a fork/branch (more than one layer)
             // diverge now: iterate that new branch, and then come back here
             if (sense->ptrlist)
-                iterate_layers(sense->nextss, super_layer, rhs, lexical);
+                iterate_layers(sense->nextss, super_ptr, rhs, lexical);
             
             // update: move towards sub types 
-            super_layer = std::move(sub_layer);
+            super_ptr = sub_ptr;
 
             // get the next layer (hyponym set)
             sense = sense->ptrlist;

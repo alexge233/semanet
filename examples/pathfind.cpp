@@ -27,8 +27,8 @@ int main(int argc, char** argv)
         // find if there exists a delta path
         // note: we do not weight for the sense!
         // this should be done here, by min-max normalising the sense count.
-        if (auto dpath = p_finder(from, to))
-            dpath->print(); 
+        auto dpath = p_finder(from, to);
+        dpath.print(); 
     }
 
     return 0;

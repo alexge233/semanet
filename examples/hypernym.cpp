@@ -21,19 +21,22 @@ void callback(const layer_ptr ptr, int i)
 ///
 /// Simple example on how to obtain hypernym graphs from wordnet
 /// 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc != 2)
+    {
+        printf("provide one words as arguments: `key`");
+        return 1;
+    }
+    std::string key(argv[1]);
     smnet::hyper_handler hp;
-
-    std::string key = "Athens";
     std::vector<smnet::graph> graphs = hp(key ,1);
     std::cout << graphs.size() << " graphs for: \""<< key <<"\" noun hypernym\r\n";
     
     for (const auto & graph : graphs)
     {
-        std::shared_ptr<smnet::layer> root = graph.root();
         int i = 0;
-        callback(root.get(), i);
+        callback(graph.root(), i);
         std::cout << std::endl;
     }
 

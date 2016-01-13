@@ -3,7 +3,7 @@ namespace smnet
 {
 
 graph::graph(const graph & rhs)
-: _layers(rhs._layers), _root(std::make_shared<layer>(*rhs._root))
+: _layers(rhs._layers), _root(rhs._root)
 {}
 
 bool graph::operator==(const graph & rhs) const 
@@ -15,35 +15,39 @@ bool graph::operator==(const graph & rhs) const
 void graph::merge_graph(const graph rhs)
 {
     // Accept and copy all layer pointers in this graphs
-    for (const auto & rhs_ptr : rhs.layers())
+    for (const auto & rhs_ptr : rhs._layers)
+        //_layers.emplace_back(std::unique_ptr<layer>(new layer(*rhs_ptr)));
         _layers.push_back(rhs_ptr);
 }
 
-void graph::add_layer(const std::shared_ptr<layer> & rhs)
+void graph::add_layer(std::shared_ptr<layer> rhs)
 {
     assert(rhs);
-    //_layers.emplace_back(std::unique_ptr<layer>(new layer(*rhs)));
+    
+    // vector _layers owns the pointer
     _layers.push_back(rhs);
+
     // if this is the first layer added, set it as root layer
-    if (!_root) _root = rhs;
+    if (!_root) 
+        _root = rhs.get();
 }
 
-std::shared_ptr<std::string> graph::find_word(const std::string key) const
+std::unique_ptr<std::string> graph::find_word(const std::string key) const
 {
     for (const auto & lr : _layers)
     {
         auto it = lr->words.find(key);
         if (it != lr->words.end())
-            return std::make_shared<std::string>(*it);
+            return std::move(std::unique_ptr<std::string>(new std::string(*it)));
     }
     return nullptr;
 }
 
-std::shared_ptr<layer> graph::find_layer(const std::string key) const
+layer* graph::find_layer(const std::string key) const
 {
     for (const auto & lr : _layers)
         if (lr->exists(key))
-            return lr;
+            return lr.get();
 
     return nullptr;
 }
@@ -84,16 +88,20 @@ std::unordered_set<std::string> graph::words() const
     return result;
 }
 
-std::shared_ptr<layer> graph::root() const
+layer * graph::root() const
 {
     assert(_root);
-    // deep copy the object and return a new unique pointer
     return _root;
 }
 
-std::vector<std::shared_ptr<layer>> graph::layers() const
+std::vector<layer*>graph::layers() const
 {
-    return _layers;
+    std::vector<layer*> result;
+    std::transform(_layers.begin(),
+                   _layers.end(),
+                   std::back_inserter(result),
+                   [](const std::shared_ptr<layer>& ptr){ return ptr.get();});
+    return result;
 }
 
 };

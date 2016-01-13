@@ -15,11 +15,11 @@ public:
     path_finder(const graph & rhs);
 
     /// find `delta_path` for @param from to @param to
-    std::unique_ptr<delta_path> operator()(std::string from, std::string to);
+    delta_path operator()(std::string from, std::string to);
 
 protected:
 
-    /// Calculate the Delta Value: `1- f(x/a)`
+    /// calculate the δ = `1- f(x/a)`
     /// where `a` is the divider,`x` is the distance and 
     /// `f` is a logistic squashing function
     inline float delta(float x)

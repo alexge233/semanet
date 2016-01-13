@@ -17,6 +17,7 @@ public:
     {
         wn_init_once();
         std::vector<graph> result;
+        // leak reported here
         if (auto ss_ptr = findtheinfo_ds(const_cast<char*>(key.c_str()),
                                          lexical, HYPERPTR, ALLSENSES))
         {
@@ -33,19 +34,23 @@ public:
                     graph grf = graph();
 
                     // lowest layer - we move towards super_classes
-                    std::shared_ptr<layer> sub_layer = get_layer(ss_ptr);
-                    grf.add_layer(sub_layer);
+                    auto sub_layer = std::make_shared<layer>(get_layer(ss_ptr));
+                    layer * sub_ptr = sub_layer.get();
+
+                    // graph add layer (owns pointer)
+                    grf.add_layer(std::move(sub_layer));
 
                     // get remaining layers
-                    iterate_layers(trc_ptr, sub_layer, grf, lexical);
+                    iterate_layers(trc_ptr, sub_ptr, grf, lexical);
 
                     // copy the graph and free that sense
-                    result.push_back(grf);
-                    free_syns(trc_ptr);
+                    result.emplace_back(grf);
+                    free_synset(trc_ptr);
                 }
-
+                auto ss_old_ptr = ss_ptr;
                 // get next sense 
                 ss_ptr = ss_ptr->nextss;
+                free_synset(ss_old_ptr);
             }
             free_syns(ss_ptr);
         }
@@ -57,7 +62,7 @@ private:
     /// Main loop for finding a sense's Hypernyms
     void iterate_layers(
                         Synset * sense,
-                        std::shared_ptr<layer> sub_layer,
+                        layer * sub_ptr,
                         graph & rhs,
                         int lexical
                       )
@@ -65,25 +70,26 @@ private:
         std::shared_ptr<layer> super_layer;
         std::vector<Synset*> pointers;
 
-        while (sense && sub_layer)
+        while (sense && sub_ptr)
         {
             // get layer (with populated `words`)
-            super_layer = get_layer(sense);
+            super_layer = std::make_shared<layer>(get_layer(sense));
 
             // link layer linked list (from sub to super & super to sub)
-            sub_layer->super_classes.push_back(super_layer.get());
-            super_layer->sub_classes.push_back(sub_layer.get());
+            sub_ptr->super_classes.push_back(super_layer.get());
+            super_layer->sub_classes.push_back(sub_ptr);
 
-            // add layer to graph - graph copies pointer (ref count++) 
-            rhs.add_layer(super_layer);
+            // add layer to graph
+            layer * super_ptr = super_layer.get();
+            rhs.add_layer(std::move(super_layer));
 
             // we encountered a fork/branch (more than one layer)
             // diverge now: iterate that new branch, and then come back here
             if (sense->ptrlist)
-                iterate_layers(sense->nextss, sub_layer, rhs, lexical);
+                iterate_layers(sense->nextss, sub_ptr, rhs, lexical);
             
             // update super_layer to sub_layer - move pointer
-            sub_layer = std::move(super_layer);
+            sub_ptr = super_ptr;
 
             // get the next layer (hypernym set)
             Synset * cpy = sense;
@@ -96,7 +102,6 @@ private:
             {
                 if (Synset * hyper_ptr = traceptrs_ds(cpy, HYPERPTR, lexical, 1))
                 {
-                    free_syns(sense);
                     sense = hyper_ptr;
                     pointers.push_back(hyper_ptr);
                 }

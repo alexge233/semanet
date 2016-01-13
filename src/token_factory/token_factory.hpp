@@ -5,6 +5,7 @@ namespace smnet
 {
 /// init wordnet once flag
 std::once_flag w_once_alloc;
+//static bool initialized;
 
 struct sense_del
 {
@@ -22,14 +23,22 @@ struct trace_del
     }
 };
 
+// Init wordnet once
 void wn_init_once()
 {
-    // Init wordnet once
     std::call_once(w_once_alloc,[]
     { 
         int res = wninit();
         if (res) throw std::runtime_error("failed to init wordnet");
     });
+    /*
+    if (!initialized)
+    {
+        int res = wninit();
+        if (res) throw std::runtime_error("failed to init wordnet");
+        initialized = true;
+    }
+    */
 }
 
 std::shared_ptr<Synset>
@@ -57,7 +66,7 @@ shared_traceptrs_ds(SynsetPtr synptr, int ptr_type, int gram_type, int depth)
 struct token_factory
 {
     /// get a layer of nodes (words) using @param synset_ptr 
-    std::shared_ptr<layer> get_layer(Synset * synset_ptr)
+    layer get_layer(Synset * synset_ptr)
     {
         assert(synset_ptr);
         std::unordered_set<std::string> words;
@@ -69,7 +78,7 @@ struct token_factory
         }
         // Create a layer_ptr and return it using the discovered words
         // immediately forfeit ownership of pointer
-        return std::move(std::make_shared<layer>(words));
+        return std::move(layer(words));
     }
 
     /// Rudimentary string cleanup from underscores
@@ -81,4 +90,18 @@ struct token_factory
     }
 };
 };
+
+/*
+namespace std
+{
+template<> struct hash<const Synset*>
+{
+    size_t operator()(const Synset* pointer) const
+    {
+        return hash<std::uintptr_t>(reinterpret_cast<std::uintptr_t>(pointer));
+    }
+};
+}
+*/
+
 #endif

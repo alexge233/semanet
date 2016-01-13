@@ -19,7 +19,7 @@ include_directories(${SRC_DIR}/)
 set (SOURCES ${SOURCES} 
                         ${SRC_DIR}/graph/graph.cpp
                         ${SRC_DIR}/path_finder/path_finder.cpp
-                        #${SRC_DIR}/SemanticWordNet/SemanticWordNet.cpp
+                        ${SRC_DIR}/utility/utility.cpp
                         )
 # WordNet 3.0
 # NOTE: OSX fix is to set the flags to search given path, Linux doesn't need this
@@ -50,11 +50,15 @@ add_executable(hypernym examples/hypernym.cpp)
 add_executable(hyponym examples/hyponym.cpp)
 add_executable(synonym examples/synonym.cpp)
 add_executable(pathfind examples/pathfind.cpp)
+add_executable(pathfind_loop examples/pathfind_loop.cpp)
+add_executable(utilities examples/utilities.cpp)
 
 target_link_libraries(hypernym ${LIBOBJ})
 target_link_libraries(hyponym ${LIBOBJ})
 target_link_libraries(synonym ${LIBOBJ})
 target_link_libraries(pathfind ${LIBOBJ})
+target_link_libraries(pathfind_loop ${LIBOBJ})
+target_link_libraries(utilities ${LIBOBJ})
 
 # NOTE - Support for Linux and OSX - Not Windows !
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

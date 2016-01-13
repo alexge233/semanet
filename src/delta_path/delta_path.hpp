@@ -39,13 +39,6 @@ struct delta_path
         ar(from, to, delta);
     }
 };
-
-/// comparison function for std::min_element
-bool compare_delta_path(const delta_path & lhs, const delta_path & rhs)
-{
-    return lhs.delta < rhs.delta;
-}
-
 };
 
 namespace std

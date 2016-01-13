@@ -19,22 +19,19 @@ public:
     /// Equality operator depends graphs not having the same layers
     bool operator==(const graph & rhs) const;
 
-    /// graph iterator
-    std::vector<std::shared_ptr<layer>> operator[](const int idx) const;
-
     /// merge a semantic @param sub graph into this one.
     /// @note the function will accept duplicate layers and nodes
     void merge_graph(const graph rhs);
 
     /// add a layer, provided it doesn't already exist 
-    void add_layer(const std::shared_ptr<layer> & rhs);
+    void add_layer(std::shared_ptr<layer> rhs);
 
     /// find for a node using @param key
-    std::shared_ptr<std::string> find_word(const std::string key) const;
+    std::unique_ptr<std::string> find_word(const std::string key) const;
 
     /// find the layer which contains @param key
     /// @return nullptr if no layer has such a key
-    std::shared_ptr<layer> find_layer(const std::string key) const;
+    layer* find_layer(const std::string key) const;
 
     /// get super_class nodes of @param node
     std::vector<std::string> super_classes(const std::string key) const;
@@ -46,22 +43,23 @@ public:
     std::unordered_set<std::string> words() const;
 
     /// get root (starting) layer
-    std::shared_ptr<layer> root() const;
+    layer * root() const;
 
     /// @return all layers
-    std::vector<std::shared_ptr<layer>> layers() const;
+    std::vector<layer*> layers() const;
 
 private:
     friend class boost::serialization::access; 
 
     /// Layers - each one contains the nodes and links with subclasses and superclasses
+    /// BUG: this appears to be leaking for some reason
     std::vector<std::shared_ptr<layer>> _layers;
-    std::shared_ptr<layer> _root;
+    layer * _root;
 
     /// (De)serialise delegate
     template <class Archive> void serialize(Archive & ar, const unsigned int)
     {
-        ar(_layers);
+        ar(_layers, _root);
     }
 };
 };

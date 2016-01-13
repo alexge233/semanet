@@ -12,7 +12,7 @@ public:
     
     /// query WordnNet for synonyms of @param key of @param lexical
     /// @param lexical is: NOUN, VERB, ADJECTIVE, ADVERB
-    std::vector<graph> operator()(std::string key, int lexical, bool deep)
+    std::vector<graph> operator()(std::string key, int lexical)
     {
         wn_init_once();
         std::vector<graph> result;
@@ -25,8 +25,11 @@ public:
                 // iterate synonyms, add them all into one layer
                 iterate_layers(ss_ptr, grf, lexical);
                 // copy the graph and free this sense
-                result.push_back(grf);
+                result.emplace_back(grf);
+                
+                auto ss_ptr_old = ss_ptr;
                 ss_ptr = ss_ptr->nextss;
+                free_synset(ss_ptr_old);
             }
             free_syns(ss_ptr);
         }
@@ -44,8 +47,8 @@ private:
         assert(sense);
         // synonyms must reside in the same layer, they are not sub/super classes
         // but simply words with `almost` the same meaning.
-        if (auto curr = get_layer(sense))
-            rhs.add_layer(curr);
+        if (auto curr = std::make_shared<layer>(get_layer(sense)))
+            rhs.add_layer(std::move(curr));
     }
 
 };
