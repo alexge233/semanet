@@ -15,30 +15,26 @@ public:
     path_finder(const graph & rhs);
 
     /// find `delta_path` for @param from to @param to
-    std::unique_ptr<delta_path> operator()(std::string from, std::string to) const;
+    std::unique_ptr<delta_path> operator()(std::string from, std::string to);
 
 protected:
 
-    /// Calculate the Delta Value: `δ = (α * direction) * (1 + distance * β)`
-    /// BUG: the formula below is not working properly:
-    ///      for [robot,android] it returns +0.9 (as expected I guess)
-    ///      for [android,robot] it returns -0.9 (not what I want)
-    /// REWORK IT
-    inline float delta(float direction, float distance)
+    /// Calculate the Delta Value: `1- f(x/a)`
+    /// where `a` is the divider,`x` is the distance and 
+    /// `f` is a logistic squashing function
+    inline float delta(float x)
     {
-        // TODO: find a way to squash the values between 0 and 1
-        //       either min-max them, or use some logistic sigmoid
-        return (alpha*direction)*(1.f+(distance * beta));
+        x = x / alpha;
+        float y = 1.7159 * tanhf(0.666666667 * x);
+        //float y = tanhf(x);
+        return 1. - y;
     }
 
     /// reference to the graph used for iteration
     const graph & _graph;
 
     /// discount factor for direction
-    const float alpha = 0.1f;
-
-    /// discount factor for distance
-    const float beta = 0.1f;
+    const float alpha = 10.;
 };
 };
 #endif
