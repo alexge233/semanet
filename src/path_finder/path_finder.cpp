@@ -5,25 +5,27 @@ namespace smnet
 path_finder::path_finder(const graph & rhs)
 : _graph(rhs){}
 
-delta_path path_finder::operator()(std::string from, std::string to)
+std::unique_ptr<delta_path> path_finder::operator()(std::string from, std::string to)
 {
-    // if same, return a delta_path of `1`
+    typedef std::unique_ptr<delta_path> delta_ptr;
+
+    // if same, return distance 0
     if (from == to)
-        return delta_path(from, to, 1.f);
+        return std::move(delta_ptr(new delta_path(from, to, 0)));
 
     // search and find within a graph the smallest `delta_path` that exists
     // Do this by locating the layers in which `from` and `to` are to be found
     layer * origin = _graph.find_layer(from);
     layer * target = _graph.find_layer(to);
 
-    // if either layer can't be found - return a delta_path of `0`
+    // if either layer can't be found - return nullptr
     if (!origin || !target)
-        return delta_path(from, to, 0.f);
+        return nullptr;
     
     // see if `origin` and `target` are in the same layer, e.g.: synonyms
-    // pass to delta distance `0.5` which will be activated.
+    // pass to delta distance `0.5`
     if (origin->exists(to))
-        return delta_path(from, to, delta(0.5f));
+        return std::move(delta_ptr(new delta_path(from, to, 0.5f)));
 
     // discovered distances
     std::vector<float> found;
@@ -76,10 +78,10 @@ delta_path path_finder::operator()(std::string from, std::string to)
     // find smallest delta_path, and return that one
     auto min_dist = std::min_element(std::begin(found), std::end(found));
     if (min_dist != found.end())
-        return delta_path(from, to, delta(*min_dist));
+        return std::move(delta_ptr(new delta_path(from, to, *min_dist)));
 
     // return a zero delta_path
-    return delta_path(from, to, 0.f);
+    return nullptr;
 }
 
 };

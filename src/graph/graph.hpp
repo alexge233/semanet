@@ -49,15 +49,16 @@ public:
     std::vector<layer*> layers() const;
 
 private:
+
     friend class boost::serialization::access; 
 
-    /// Layers - each one contains the nodes and links with subclasses and superclasses
-    /// BUG: this appears to be leaking for some reason
+    /// graph layers - this vector owns them
     std::vector<std::shared_ptr<layer>> _layers;
     layer * _root;
 
     /// (De)serialise delegate
-    template <class Archive> void serialize(Archive & ar, const unsigned int)
+    template <class Archive> 
+    void serialize(Archive & ar, const unsigned int)
     {
         ar(_layers, _root);
     }

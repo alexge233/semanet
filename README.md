@@ -40,14 +40,37 @@ You should now have in your `build` directory:
 * `hyponym` an example on how to get hyponyms and print them on stdout
 * `synonym` an example on how to get synonyms and prin them on stdout
 * `pathfind` an example on how to obtain semantic difference between two words
+* `pathfind_loop` an example on how `path_finder` and `delta_path` squash semantic distance values
+* `utilities` an example on how to acquire all senses, and how to find intersections between different graphs
 
 ##Guide about SemaNet
 
-TODO
+SemaNet was built for those reasons:
+
+* Avoid dealing with the dreaded C WordNet library, which is at the moment of writing this 20 years old.
+* Avoid dealing with memory allocations and de-allocations. Up until know I have not seen anywhere an example
+which explains how to use WordNet whilst properly managing memory.
+* Do some rudimentary graph operations on the acquired graph senses.
+* Establish *semantic similarity* or *distance* between two **words**. This is **not** a vector space model,
+but a *single entity* semantic similarity quantification (for more info, see class `delta_path` and `path_finder`).
+
+You can use SemaNet for most of the stuff you would use WordNet.
+What's missing are:
+
+* Antonyms
+* Morphing
+* Other non-semantics related functionality
+
+You can also use it to acquire and manipulate the actual semantic tree graph, as encoded by wordnet,
+but in a friedly to C++ manner.
+
+You can search for paths and traverse semantic graphs,
+or merge multiple graphs to create a Semantic map.
 
 ##Using SemaNet
 
-TODO
+All examples are under the `examples` folder.
+Have a look at them, they provide a simple synopsis of how to use SemaNet.
 
 ##Notes about WordNet
 

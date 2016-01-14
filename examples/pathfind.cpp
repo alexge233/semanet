@@ -1,5 +1,5 @@
 #include <iostream>
-#include <memory>
+#include <vector>
 #include "path_finder/path_finder.hpp"
 #include "hyper_handler/hyper_handler.hpp"
 /// 
@@ -28,7 +28,8 @@ int main(int argc, char** argv)
         // note: we do not weight for the sense!
         // this should be done here, by min-max normalising the sense count.
         auto dpath = p_finder(from, to);
-        dpath.print(); 
+        if (dpath)
+            dpath->print(); 
     }
 
     return 0;

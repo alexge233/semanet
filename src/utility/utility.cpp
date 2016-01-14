@@ -3,12 +3,12 @@ namespace smnet
 {
 
 // get all graphs/senses from wordnet
-smnet::senses query_all_senses(std::string key, int lexical)
+smnet::sense query_all_senses(std::string key, int lexical)
 {
     // return the sense triplet
-    return std::move(std::make_tuple(hyper_handler()(key, lexical), 
-                                     hypo_handler()(key, lexical), 
-                                     syno_handler()(key, lexical)));
+    return std::move((sense){hyper_handler()(key, lexical), 
+                             hypo_handler()(key, lexical), 
+                             syno_handler()(key, lexical)});
 }
 
 // find words that exist in both graphs
@@ -27,20 +27,24 @@ std::unordered_set<std::string> word_intersections(const graph & lhs, const grap
 }
 
 // find layers that exist in both graphs
-std::vector<std::shared_ptr<layer>> layer_intersections(const graph & lhs, const graph & rhs)
+std::vector<layer*> layer_intersections(const graph & lhs, const graph & rhs)
 {
+    std::vector<layer*> lhs_layers = lhs.layers();
+    std::vector<layer*> rhs_layers = rhs.layers(); 
+    std::vector<layer*> common;
 
-}
+    for (layer* lhs_ptr : lhs_layers)
+        for (layer* rhs_ptr : rhs_layers)
+            if (*lhs_ptr == *rhs_ptr)
+                if (std::find_if(common.begin(),
+                                 common.end(),
+                                 [&](const layer* ptr)
+                                 { return *ptr == *lhs_ptr;}) == common.end())
+                {
+                    common.push_back(lhs_ptr);
+                }
 
-// exhaust all possible searches and find a path
-std::unique_ptr<delta_path> iter_find_path(std::string from, std::string to)
-{
-
-}
-
-bool compare_delta_path(const delta_path & lhs, const delta_path & rhs)
-{
-    return lhs.delta > rhs.delta;
+    return common;
 }
 
 };

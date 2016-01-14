@@ -25,8 +25,8 @@ int main(int argc, char** argv)
         for (const std::string & to : queries)
         {
             smnet::path_finder p_finder(graph);
-            auto path = p_finder(from, to);
-            path.print(); 
+            if(auto path = p_finder(from, to))
+                path->print(); 
         }
     }
 

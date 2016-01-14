@@ -21,22 +21,38 @@ struct layer
     : words(others)
     {}
 
-    /// Equality based upon all nodes being equal
-    bool operator==(const layer & rhs) const
+    /// equality based upon all nodes being equal
+    /// operator ignores `sub_classes` and `super_classes`
+    inline bool operator==(const layer & rhs) const
     {
         return this->words == rhs.words;
     }
 
     /// does @param rhs exist in this layer 
-    bool exists(const std::string & rhs) const
+    inline bool exists(const std::string & rhs) const
     {
         return words.find(rhs) != words.end() ? true : false;
     }
 
-    template <class Archive> void serialize(Archive & ar, const unsigned int)
+    template <class Archive>
+    void serialize(Archive & ar, const unsigned int)
     {
         ar(words, sub_classes, super_classes);
     }
 };
 };
+
+namespace std
+{
+template<> struct hash<smnet::layer>
+{
+    size_t operator()(const smnet::layer & rhs) const
+    {
+        std::size_t seed = 0;
+        for (const std::string & word : rhs.words)
+            boost::hash_combine(seed, boost::hash_value(word));
+        return seed;
+    }
+};
+}
 #endif

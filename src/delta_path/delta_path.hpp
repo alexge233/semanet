@@ -3,7 +3,7 @@
 #include "includes.ihh"
 namespace smnet
 {
-/// @brief `delta_path` describes the *semantic distance* between two nodes
+/// @brief `delta_path` describes the *semantic value* between two nodes
 /// @date November 2015
 /// @class delta_path
 ///
@@ -11,34 +11,39 @@ struct delta_path
 {
     std::string from;
     std::string to;
-    float delta = 0.f;
+    float value = 0.f;
 
-
-    delta_path(std::string origin, std::string target, float value)
-    : from(origin), to(target), delta(value) {}
+    delta_path(std::string origin, std::string target, float distance)
+    : from(origin), to(target), value(distance) {}
 
     /// Sort delta values based on `from` and then `to` node values
-    bool operator<(const delta_path & rhs)
+    inline bool operator<(const delta_path & rhs)
     {
         return (this->from < rhs.from) && (this->to < rhs.to);
     }
 
     /// Equality depends on both `from` and `to` node values
-    bool operator==(const delta_path & rhs)
+    inline bool operator==(const delta_path & rhs)
     {
         return (this->from == rhs.from) && (this->to == rhs.to);
     }
 
     void print() 
     {
-        printf("%s ≈ %s: %f\r\n", from.c_str(), to.c_str(), delta);
+        printf("%s ≈ %s: %f\r\n", from.c_str(), to.c_str(), value);
     }
 
     template <class Archive> void serialize(Archive & ar, const unsigned int)
     {
-        ar(from, to, delta);
+        ar(from, to, value);
     }
 };
+
+/// compare deltas and get the ones with smalled distances
+static inline bool min_delta(const delta_path & lhs, const delta_path & rhs)
+{
+    return (lhs.value < rhs.value);
+}
 };
 
 namespace std

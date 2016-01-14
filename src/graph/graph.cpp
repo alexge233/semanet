@@ -8,8 +8,15 @@ graph::graph(const graph & rhs)
 
 bool graph::operator==(const graph & rhs) const 
 {
-    // TODO: BUGFIX, this compares pointers to layers, not layers themselves
-    return this->_layers == rhs._layers;
+    typedef std::shared_ptr<layer> layer_ptr;
+    // custom lambda comparison based on `layer->words`
+    if (this->_layers.size() == rhs._layers.size())
+        return  std::equal(_layers.begin(), _layers.end(), 
+						   rhs._layers.begin(), 
+                           [](const layer_ptr & lhs, const layer_ptr & rhs)->bool 
+                           { return *lhs == *rhs;});
+    else
+        return false;
 }
 
 void graph::merge_graph(const graph rhs)
