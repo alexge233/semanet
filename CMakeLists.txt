@@ -36,13 +36,13 @@ find_package(Boost 1.56 COMPONENTS serialization REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 # Setup library stuff
-add_library (semanet OBJECT ${SOURCES})
-add_library (semanet-${V_MAJOR}.${V_MINOR} SHARED $<TARGET_OBJECTS:semanet>)
-target_link_libraries(semanet-${V_MAJOR}.${V_MINOR} ${Boost_SERIALIZATION_LIBRARY} ${WORDNET})
-set(LIBOBJ ${LIBOBJ} semanet-${V_MAJOR}.${V_MINOR})
+add_library (smnet OBJECT ${SOURCES})
+add_library (smnet-${V_MAJOR}.${V_MINOR} SHARED $<TARGET_OBJECTS:smnet>)
+target_link_libraries(smnet-${V_MAJOR}.${V_MINOR} ${Boost_SERIALIZATION_LIBRARY} ${WORDNET})
+set(LIBOBJ ${LIBOBJ} smnet-${V_MAJOR}.${V_MINOR})
 
 set(CMAKE_COLOR_MAKEFILE on)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 # Add hypernym example
 add_executable(hypernym examples/hypernym.cpp)
@@ -97,3 +97,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     message (FATAL_ERROR "unsupported compiler")
 endif()
+
+# Install stuff
+install(TARGETS ${LIBOBJ}  DESTINATION /usr/local/lib/)
+install(DIRECTORY src/ DESTINATION /usr/local/include/${PROJECT_NAME} FILES_MATCHING PATTERN "*.ihh" PATTERN "*.hpp" PATTERN "*.hxx")
+# Master include file
+install(FILES src/smnet DESTINATION /usr/local/include/${PROJECT_NAME})

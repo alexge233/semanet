@@ -1,17 +1,4 @@
-TODO [0.1]
-
-    1) find a formula that will squash and work properly for `delta_values`
-       have a look at energy functions and logistic functions
-
-    2) Remove all threaded code from SemanticWordNet
-    
-    3) Fix SemanticWordNet: make it a `memory` class (which stores `delta_path`s)
-                            remove all senses and reference to them
-                            use as a `utility` class which searches delta_path intersections
-                            for example, find common words between two graphs, and then establish relational metrics
-
 TEST [0.1]
 
-    1) test graph (alone) - add unit tests for graph
-    2) test path_finder & delta_path (ASAP)
-    3) finally, test the SemanticWordNet (or wtv you rename it to)
+    1) test graph (alone) - add unit tests
+    2) test layer (alone) - add unit tests

@@ -35,13 +35,39 @@ make
 
 You should now have in your `build` directory:
 
-* `libsemanet-0.1.so` (unless you changed `CMakeLists.txt` to build a static library)
+* the library `libsemanet-0.1.so` (unless you changed `CMakeLists.txt` to build a static library)
 * `hypernym` an example on how to get hypernyms and print them on stdout
 * `hyponym` an example on how to get hyponyms and print them on stdout
 * `synonym` an example on how to get synonyms and prin them on stdout
 * `pathfind` an example on how to obtain semantic difference between two words
 * `pathfind_loop` an example on how `path_finder` and `delta_path` squash semantic distance values
 * `utilities` an example on how to acquire all senses, and how to find intersections between different graphs
+* `delta_best` an example on how to acquire the best delta paths, using semantic graph intersections
+
+##Installing
+
+From inside your `build` directory, if you have `sudo` then type:
+
+```
+sudo make install
+```
+
+else, `su` and as root type:
+
+```
+make install
+```
+
+The library will be copied in your `usr/local/lib` directory.
+The headers will be copied in your `usr/local/include` directory.
+You can include any header from `usr/local/include/smnet/` directory, or
+you can include the global directory:
+
+```
+#include <smnet/smnet>
+```
+
+Don't forget to link against `libsmnet-0.1.so`!
 
 ##Guide about SemaNet
 
