@@ -1,5 +1,4 @@
 #SemaNet [0.1]
-#This is Work in Progress
 
 A C++11 library built on top of WordNet 3.0.
 It offers:
