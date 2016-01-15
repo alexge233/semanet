@@ -5,6 +5,6 @@
 extern "C" {
   #include <wn.h>
 };
-#include "graph/graph.hpp"
-#include "token_factory/token_factory.hpp"
-#include "layer/layer.hpp"
+#include "../graph/graph.hpp"
+#include "../token_factory/token_factory.hpp"
+#include "../layer/layer.hpp"

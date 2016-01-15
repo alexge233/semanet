@@ -4,10 +4,10 @@
 #include <unordered_set>
 #include <tuple>
 
-#include "path_finder/path_finder.hpp"
-#include "delta_path/delta_path.hpp"
-#include "graph/graph.hpp"
-#include "layer/layer.hpp"
-#include "hyper_handler/hyper_handler.hpp"
-#include "hypo_handler/hypo_handler.hpp"
-#include "syno_handler/syno_handler.hpp"
+#include "../path_finder/path_finder.hpp"
+#include "../delta_path/delta_path.hpp"
+#include "../graph/graph.hpp"
+#include "../layer/layer.hpp"
+#include "../hyper_handler/hyper_handler.hpp"
+#include "../hypo_handler/hypo_handler.hpp"
+#include "../syno_handler/syno_handler.hpp"

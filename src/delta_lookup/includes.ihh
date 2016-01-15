@@ -2,4 +2,4 @@
 #include <string>
 #include <unordered_set>
 #include <boost/serialization/serialization.hpp>
-#include "delta_path/delta_path.hpp"
+#include "../delta_path/delta_path.hpp"

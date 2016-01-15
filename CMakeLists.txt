@@ -101,5 +101,4 @@ endif()
 # Install stuff
 install(TARGETS ${LIBOBJ}  DESTINATION /usr/local/lib/)
 install(DIRECTORY src/ DESTINATION /usr/local/include/${PROJECT_NAME} FILES_MATCHING PATTERN "*.ihh" PATTERN "*.hpp" PATTERN "*.hxx")
-# Master include file
-install(FILES src/smnet DESTINATION /usr/local/include/${PROJECT_NAME})
+
