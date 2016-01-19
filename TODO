@@ -1,4 +1,5 @@
-TEST [0.1]
+TODO [0.1]
 
+    0) sense should record the query word
     1) test graph (alone) - add unit tests
     2) test layer (alone) - add unit tests

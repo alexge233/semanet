@@ -3,6 +3,10 @@
 #include "includes.ihh"
 namespace smnet
 {
+/// forward declare a friend
+class hyper_handler;
+///
+///
 /// @brief class `graph` encapsulates a semantic graph, as a tree graph
 /// @date January 2016
 ///
@@ -48,19 +52,24 @@ public:
     /// @return all layers
     std::vector<layer*> layers() const;
 
+    /// max distance (branch or trunk)
+    unsigned int max_distance() const;
+
 private:
 
     friend class boost::serialization::access; 
+    friend class smnet::hyper_handler;
 
     /// graph layers - this vector owns them
     std::vector<std::shared_ptr<layer>> _layers;
     layer * _root;
+    unsigned int _max_dist = 0;
 
     /// (De)serialise delegate
     template <class Archive> 
     void serialize(Archive & ar, const unsigned int)
     {
-        ar(_layers, _root);
+        ar(_layers, _root, _max_dist);
     }
 };
 };

@@ -3,7 +3,7 @@ namespace smnet
 {
 
 graph::graph(const graph & rhs)
-: _layers(rhs._layers), _root(rhs._root)
+: _layers(rhs._layers), _root(rhs._root), _max_dist(rhs._max_dist)
 {}
 
 bool graph::operator==(const graph & rhs) const 
@@ -109,6 +109,11 @@ std::vector<layer*>graph::layers() const
                    std::back_inserter(result),
                    [](const std::shared_ptr<layer>& ptr){ return ptr.get();});
     return result;
+}
+
+unsigned int graph::max_distance() const
+{
+    return _max_dist;
 }
 
 };

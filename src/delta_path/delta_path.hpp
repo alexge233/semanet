@@ -17,13 +17,13 @@ struct delta_path
     : from(origin), to(target), value(distance) {}
 
     /// Sort delta values based on `from` and then `to` node values
-    inline bool operator<(const delta_path & rhs)
+    inline bool operator<(const delta_path & rhs) const
     {
         return (this->from < rhs.from) && (this->to < rhs.to);
     }
 
     /// Equality depends on both `from` and `to` node values
-    inline bool operator==(const delta_path & rhs)
+    inline bool operator==(const delta_path & rhs) const
     {
         return (this->from == rhs.from) && (this->to == rhs.to);
     }
@@ -50,7 +50,7 @@ namespace std
 {
 template<> struct hash<smnet::delta_path>
 {
-    size_t operator()(const smnet::delta_path & rhs) const
+    size_t operator()(smnet::delta_path const& rhs) const
     {
         std::size_t seed = 0;
         boost::hash_combine(seed, rhs.from);

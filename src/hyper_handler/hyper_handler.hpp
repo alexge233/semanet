@@ -40,14 +40,15 @@ public:
                     // graph add layer (owns pointer)
                     grf.add_layer(std::move(sub_layer));
 
-                    // get remaining layers
-                    iterate_layers(trc_ptr, sub_ptr, grf, lexical);
+                    // get remaining layers (count max distance in the graph)
+                    grf._max_dist = iterate_layers(trc_ptr, sub_ptr, grf, lexical, 0);
 
                     // copy the graph and free that sense
                     result.emplace_back(grf);
                     free_synset(trc_ptr);
                 }
                 auto ss_old_ptr = ss_ptr;
+
                 // get next sense 
                 ss_ptr = ss_ptr->nextss;
                 free_synset(ss_old_ptr);
@@ -60,15 +61,17 @@ public:
 private:
     
     /// Main loop for finding a sense's Hypernyms
-    void iterate_layers(
-                        Synset * sense,
-                        layer * sub_ptr,
-                        graph & rhs,
-                        int lexical
-                      )
+    unsigned int iterate_layers(
+                                 Synset * sense,
+                                 layer * sub_ptr,
+                                 graph & rhs,
+                                 int lexical,
+                                 unsigned int distance
+                              )
     {
         std::shared_ptr<layer> super_layer;
         std::vector<Synset*> pointers;
+        unsigned int max = 0;
 
         while (sense && sub_ptr)
         {
@@ -82,14 +85,19 @@ private:
             // add layer to graph
             layer * super_ptr = super_layer.get();
             rhs.add_layer(std::move(super_layer));
+            distance++;
+            unsigned int branch = 0;
 
             // we encountered a fork/branch (more than one layer)
             // diverge now: iterate that new branch, and then come back here
             if (sense->ptrlist)
-                iterate_layers(sense->nextss, sub_ptr, rhs, lexical);
+                branch = iterate_layers(sense->nextss, sub_ptr, rhs, lexical, distance);
             
             // update super_layer to sub_layer - move pointer
             sub_ptr = super_ptr;
+
+            if (branch > max) max = branch;
+            if (distance > max) max = distance;
 
             // get the next layer (hypernym set)
             Synset * cpy = sense;
@@ -110,6 +118,8 @@ private:
         // release all pointers obtained earlier
         for (auto & ptr : pointers)
             free_syns(ptr);
+
+        return max;
     }
 };
 };

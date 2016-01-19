@@ -5,8 +5,9 @@ namespace smnet
 // get all graphs/senses from wordnet
 smnet::sense query_all_senses(std::string key, int lexical)
 {
-    // return the sense triplet
-    return std::move((sense){hyper_handler()(key, lexical), 
+    // return the sense
+    return std::move((sense){key, lexical,
+                             hyper_handler()(key, lexical), 
                              hypo_handler()(key, lexical), 
                              syno_handler()(key, lexical)});
 }

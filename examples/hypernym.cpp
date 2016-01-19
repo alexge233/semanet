@@ -38,6 +38,7 @@ int main(int argc, char** argv)
         int i = 0;
         callback(graph.root(), i);
         std::cout << std::endl;
+        std::cout << "max distance: " << graph.max_distance() << std::endl;
     }
 
     return 0;

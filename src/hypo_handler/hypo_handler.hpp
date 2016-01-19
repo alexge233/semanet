@@ -3,6 +3,7 @@
 #include "includes.ihh"
 namespace smnet
 {
+///
 /// @brief class hypo_handler extracts hyponym senses as graphs from WordNet
 /// @date January 2017
 ///
@@ -54,10 +55,10 @@ public:
 private:
     
     void iterate_layers(
-                        Synset * sense,
-                        layer * super_ptr,
-                        graph & rhs,
-                        int lexical
+                         Synset * sense,
+                         layer * super_ptr,
+                         graph & rhs,
+                         int lexical
                       )
     {
         std::shared_ptr<layer> sub_layer;

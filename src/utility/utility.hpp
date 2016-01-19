@@ -10,9 +10,11 @@ namespace smnet
 /// a Triplet of hypernyms, hyponyms and synonyms.
 struct sense
 {
-    std::vector<graph> hypernyms;
-    std::vector<graph> hyponyms;
-    std::vector<graph> synonyms;
+    const std::string query;
+    const int lexical;
+    const std::vector<graph> hypernyms;
+    const std::vector<graph> hyponyms;
+    const std::vector<graph> synonyms;
 };
 
 /// @brief query all types of graphs for specific lexical type

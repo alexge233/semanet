@@ -21,22 +21,25 @@ set (SOURCES ${SOURCES}
                         ${SRC_DIR}/path_finder/path_finder.cpp
                         ${SRC_DIR}/utility/utility.cpp)
 
+# BOOST 
+find_package(Boost 1.56 COMPONENTS serialization REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+
 # WordNet 3.0
 # NOTE: OSX fix is to set the flags to search given path, Linux doesn't need this
 # PATHS /usr/local/WordNet-3.0 PATH_SUFFIXES lib)
-find_library(WORDNET NAMES wordnet WN WN.a libWN.a wordnet-3.0) 
+#set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+find_library(WORDNET NAMES wordnet WN libWN wordnet-3.0) 
 if (WORDNET)
     message(STATUS ${WORDNET})
 else (!WORDNET)
     message(FATAL_ERROR "ERROR: missing libwordnet")
 endif(WORDNET)
 
-# BOOST 
-find_package(Boost 1.56 COMPONENTS serialization REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
 
-# Setup library stuff
+# Setup library stuff - WARNING if you want static wordnet.a you should build sment static too
 add_library (smnet OBJECT ${SOURCES})
+#set(CMAKE_SHARED_LINKER_FLAGS "-Wl --export-all-symbols -std=gnu++11 -fPIC")
 add_library (smnet-${V_MAJOR}.${V_MINOR} SHARED $<TARGET_OBJECTS:smnet>)
 target_link_libraries(smnet-${V_MAJOR}.${V_MINOR} ${Boost_SERIALIZATION_LIBRARY} ${WORDNET})
 set(LIBOBJ ${LIBOBJ} smnet-${V_MAJOR}.${V_MINOR})
