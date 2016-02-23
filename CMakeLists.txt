@@ -40,9 +40,9 @@ endif(WORDNET)
 # Setup library stuff - WARNING if you want static wordnet.a you should build sment static too
 add_library (smnet OBJECT ${SOURCES})
 #set(CMAKE_SHARED_LINKER_FLAGS "-Wl --export-all-symbols -std=gnu++11 -fPIC")
-add_library (smnet-${V_MAJOR}.${V_MINOR} SHARED $<TARGET_OBJECTS:smnet>)
-target_link_libraries(smnet-${V_MAJOR}.${V_MINOR} ${Boost_SERIALIZATION_LIBRARY} ${WORDNET})
-set(LIBOBJ ${LIBOBJ} smnet-${V_MAJOR}.${V_MINOR})
+add_library (smnet.${V_MAJOR}.${V_MINOR} SHARED $<TARGET_OBJECTS:smnet>)
+target_link_libraries(smnet.${V_MAJOR}.${V_MINOR} ${Boost_SERIALIZATION_LIBRARY} ${WORDNET})
+set(LIBOBJ ${LIBOBJ} smnet.${V_MAJOR}.${V_MINOR})
 
 set(CMAKE_COLOR_MAKEFILE on)
 set(CMAKE_BUILD_TYPE Release)
@@ -104,4 +104,4 @@ endif()
 # Install stuff
 install(TARGETS ${LIBOBJ}  DESTINATION /usr/local/lib/)
 install(DIRECTORY src/ DESTINATION /usr/local/include/${PROJECT_NAME} FILES_MATCHING PATTERN "*.ihh" PATTERN "*.hpp" PATTERN "*.hxx")
-
+# TODO: Set symbolic link from /usr/local/lib/lbsmnet.0.1.so to /usr/local/lib/libsmnet.so
