@@ -21,12 +21,21 @@ Installing `g++`, `cmake` and `boost` is fairly common on Linux/OSX these days.
 Take special care when installing WordNet: OSX uses different paths, so you may have
 to edit the `CMakeLists.txt` file.
 
+On Ubuntu 16.04, the following should satisfy all the dependencies (assuming a g++/gcc already installed)
+
+```bash
+sudo apt-get install libboost-all-dev wordnet wordnet-dev cmake
+```
+
+For older Ubuntu (14.04) you need to manually build `libboost-serialization` to be at least 1.56 or higher.
+Other Linuxes (Debian, Arch, etc) have to also manually build boost, and maybe (WordNet from source)[https://github.com/wordnet/wordnet].
+
 ##Building
 
 In order to build, please ensure you have satisfied all dependencies first.
 
 ```
-mkddir build
+mkdir build
 cd build
 cmake ..
 make
