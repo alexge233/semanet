@@ -1,6 +1,7 @@
 #ifndef _smnet_token_factory_HPP_
 #define _smnet_token_factory_HPP_
 #include "includes.ihh"
+#include "wn_init_singleton.hpp"
 namespace smnet
 {
 /// @brief base struct `token_factory` for all wordnet handlers, retrieves actual strings
@@ -8,17 +9,10 @@ namespace smnet
 ///
 struct token_factory
 {
-    /// init wordnet once flag
-    std::once_flag w_once_alloc;
-
     /// Init wordnet once per lifetime of a process
     inline void wn_init_once()
     {
-        std::call_once(w_once_alloc,[]
-        { 
-            int res = wninit();
-            if (res) throw std::runtime_error("failed to init wordnet");
-        });
+        wn_init_singleton::singleton();
     }
 
     /// get a layer of nodes (words) using @param synset_ptr 

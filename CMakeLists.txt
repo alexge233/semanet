@@ -19,10 +19,12 @@ include_directories(${SRC_DIR}/)
 set (SOURCES ${SOURCES} 
                         ${SRC_DIR}/graph/graph.cpp
                         ${SRC_DIR}/path_finder/path_finder.cpp
+                        ${SRC_DIR}/token_factory/wn_init_singleton.cpp
                         ${SRC_DIR}/utility/utility.cpp)
 
 # BOOST 
 find_package(Boost 1.56 COMPONENTS serialization REQUIRED)
+find_package(Threads REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 # WordNet 3.0
@@ -41,11 +43,11 @@ endif(WORDNET)
 add_library (smnet OBJECT ${SOURCES})
 #set(CMAKE_SHARED_LINKER_FLAGS "-Wl --export-all-symbols -std=gnu++11 -fPIC")
 add_library (smnet.${V_MAJOR}.${V_MINOR} SHARED $<TARGET_OBJECTS:smnet>)
-target_link_libraries(smnet.${V_MAJOR}.${V_MINOR} ${Boost_SERIALIZATION_LIBRARY} ${WORDNET})
+target_link_libraries(smnet.${V_MAJOR}.${V_MINOR} ${Boost_SERIALIZATION_LIBRARY} ${WORDNET} ${CMAKE_THREAD_LIBS_INIT})
 set(LIBOBJ ${LIBOBJ} smnet.${V_MAJOR}.${V_MINOR})
 
 set(CMAKE_COLOR_MAKEFILE on)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 # Add hypernym example
 add_executable(hypernym examples/hypernym.cpp)
@@ -88,7 +90,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   elseif ()
     message (FATAL_ERROR "g++ version >= 4.9 is required")
   endif()
-  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=gnu++11 -Wall -fPIC")
+  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -Wall -fPIC")
   message(STATUS "CXX Flags: " ${CMAKE_CXX_FLAGS})
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -mtune=native -march=native") # -s ?
