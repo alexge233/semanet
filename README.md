@@ -1,4 +1,4 @@
-#SemaNet [0.1]
+# SemaNet [0.1]
 
 A C++11 library built on top of WordNet 3.0.
 It offers:
@@ -8,7 +8,7 @@ It offers:
 * Path finding between words, and quantifying their *semantic distance*
 * Other utilities such as intersections and unions of WordNet tree graphs.
 
-##Dependencies
+## Dependencies
 
 SemaNet library depends on:
 
@@ -30,7 +30,7 @@ sudo apt-get install libboost-all-dev wordnet wordnet-dev cmake
 For older Ubuntu (14.04) you need to manually build `libboost-serialization` to be at least 1.56 or higher.
 Other Linuxes (Debian, Arch, etc) have to also manually build boost, and maybe (WordNet from source)[https://github.com/wordnet/wordnet].
 
-##Building
+## Building
 
 In order to build, please ensure you have satisfied all dependencies first.
 
@@ -52,7 +52,7 @@ You should now have in your `build` directory:
 * `utilities` an example on how to acquire all senses, and how to find intersections between different graphs
 * `delta_best` an example on how to acquire the best delta paths, using semantic graph intersections
 
-##Installing
+## Installing
 
 From inside your `build` directory, if you have `sudo` then type:
 
@@ -101,7 +101,7 @@ but in a friedly to C++ manner.
 You can search for paths and traverse semantic graphs,
 or merge multiple graphs to create a Semantic map.
 
-##Using SemaNet
+## Using SemaNet
 
 All examples are under the `examples` folder.
 Have a look at them, they provide a simple synopsis of how to use SemaNet.
@@ -119,7 +119,7 @@ within which your query resides.
 Depending on the type of query and the lexical category (Noun, Verb, Adjective, Adverb)
 most words share some kind of abstract archetype.
 
-###Hyponyms
+### Hyponyms
 Hyponyms are *specializations* or *instantiations* linked as sub-classes
 or sub-ordinate words which add specificity to your query.
 Those are always returned as a single layer below your current layer
@@ -132,14 +132,14 @@ would return a huge graph.
 Thus, if you wish to search all known sub-classes, you have to do
 multiple queries, compared to hypernyms which requires a single query.
 
-###Synonyms
+### Synonyms
 Synonyms simply denote words which are *almost* the same (or exactly the same).
 Thus when you query synonyms, you will get a layer which contains your query word,
 as well as other words (the synonyms).
 
-###Antonyms
+### Antonyms
 As of version (0.1) I have not implemented antonyms.
 
-###Contributor
+### Contributor
 
 - Alexander Giokas, **[a.gkiokas@warwick.ac.uk]**
