@@ -77,7 +77,7 @@ you can include the global directory:
 
 Don't forget to link against `libsmnet-0.1.so`!
 
-##Guide about SemaNet
+## Guide about SemaNet
 
 SemaNet was built for those reasons:
 
@@ -106,11 +106,11 @@ or merge multiple graphs to create a Semantic map.
 All examples are under the `examples` folder.
 Have a look at them, they provide a simple synopsis of how to use SemaNet.
 
-##Notes about WordNet
+## Notes about WordNet
 
 It is important to know how exactly WordNet works, in order to efficiently use SemaNet.
 
-###Hypernyms
+### Hypernyms
 Hypernyms are essentially graphs of super-classes (or super-ordinates).
 WordNet uses tree-graphs where your query will be at the bottom layer,
 and all super-classes will be returned as layers above the root layer,
