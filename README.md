@@ -140,6 +140,10 @@ as well as other words (the synonyms).
 ### Antonyms
 As of version (0.1) I have not implemented antonyms.
 
-### Contributor
+### Citing
 
-- Alexander Giokas, **[a.gkiokas@warwick.ac.uk]**
+If you use SemaNet for Academic or Research purposes, please cite my thesis (which goes into depth on how SemaNet is used):
+
+```
+Gkiokas, Alexandros. "Imitation learning in artificial intelligence." PhD diss., University of Warwick, 2016.
+```
